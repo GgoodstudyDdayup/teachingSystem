@@ -1,0 +1,178 @@
+.m-biaozhun {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    min-width: 800px;
+}
+
+.m-biaozhunTree {
+    float: left;
+    width: 300px;
+    min-height: 500px;
+}
+
+.linkage-selected {
+    position: relative;
+    width: 270px;
+    border: 1px solid #c4d8ff;
+    border-radius: 4px;
+}
+
+.linkage-selected .linkage-container {
+    position: relative;
+    padding: 7px 10px;
+}
+
+.linkage-selected .linkage-container .linkage-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 14px;
+    line-height: 30px;
+}
+
+.linkage-selected .linkage-container .linkage-item>label {
+    color: #999;
+    width: 40px;
+}
+
+.linkage-selected .linkage-container .linkage-item>span {
+    color: #2a3245;
+}
+
+.linkage-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25px;
+    height: 25px;
+}
+
+.linkage-selected .hover-container {
+    position: absolute;
+    top: -10px;
+    left: 255px;
+    z-index: 60;
+    margin-left: 15px;
+    padding: 20px;
+    width: 620px;
+    background-color: #fff;
+    border-radius: 1px;
+    box-shadow: 0 0 15px rgba(11, 45, 132, .3);
+    width: 570px;
+}
+
+.m-file-container {
+    width: 100%;
+    padding: 20px 15px;
+    margin-left: 10px;
+    min-height: 500px;
+    border-left: 1px solid #ccc;
+}
+
+.file-list {
+    margin-bottom: 30px;
+}
+
+@media screen and (min-height: 900px) {
+    .file-list {
+        min-height: 810px!important;
+    }
+}
+
+@media screen and (min-height: 800px) {
+    .file-list {
+        min-height: 710px!important;
+    }
+}
+
+@media screen and (min-height: 700px) {
+    .file-list {
+        min-height: 650px!important;
+    }
+}
+
+.handout-list {
+    position: relative;
+    height: 45px;
+    border: 0;
+    border-bottom: 1px dashed #d7dfe8;
+    line-height: 45px;
+    color: #2a3245;
+    font-size: 14px;
+}
+
+.handout-list:hover {
+    background-color: #f5f7f9;
+    color: #69f;
+    cursor: pointer
+}
+
+.atf-ykt-default {
+    background-image: url('../img/iconjiang.png');
+}
+
+.filename {
+    display: inline-block;
+    max-width: 80%;
+    vertical-align: middle;
+}
+
+li {
+    list-style: none;
+}
+
+.svg {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.link {
+    color: #69f;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.linkflex {
+    display: flex;
+    align-items: center;
+}
+
+.m-action {
+    width: 290px;
+    position: absolute;
+    left: 400px;
+    display: flex;
+}
+
+.appear {
+    display: none;
+}
+
+.listMineZiyuan {
+    width: 100%;
+    height: 280px;
+    overflow-y: scroll;
+    min-height: 200px;
+}
+
+.question-active {
+    display: none;
+}
+
+.cuowuleixin::before {
+    content: "*";
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 1;
+    font-family: SimSun;
+    font-size: 12px;
+    color: #ed3f14;
+    
+}
