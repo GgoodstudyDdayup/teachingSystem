@@ -1,12 +1,18 @@
-import { instance, loginPost } from './axios'
+import { instance, loginPost,downLoad } from './axios'
 //login为了获取token
 export const login = (params) => {
     return loginPost.post('/api/user/login', params)
 }
+
 //logout
 export const logout = (params) => {
     return loginPost.post('/api/user/logout', params)
 }
+//downLoad下载试卷
+export const downLoadzujuan = (params) => {
+    return downLoad.get(`/api/download/self_paper?self_paper_id=${params.self_paper_id}&token=${params.token}`)
+}
+
 //instance实例作为系统内部cookie验证每个接口
 export const tree = (params) => {
     return instance.post('/api/system/get_tree', params)

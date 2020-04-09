@@ -3,7 +3,7 @@ import { message, BackTop, Result, Select, Radio, Icon, Badge, Tabs, Button, Mod
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Know from '../../../bk/kejianKnowList'
 import List from '../../../tk/jigouList'
-import { del_self_paper, get_own_subject_list, get_grade_list, get_list, get_self_paper_question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../../../axios/http'
+import { downLoadzujuan, del_self_paper, get_own_subject_list, get_grade_list, get_list, get_self_paper_question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../../../axios/http'
 const { Option } = Select
 const { TabPane } = Tabs;
 const { confirm } = Modal;
@@ -292,7 +292,7 @@ class tikuguanli2 extends Component {
                     title: '',
                     datiTime: '',
                     totalNum: '',
-                    list:[]
+                    list: []
                 })
             } else {
                 this.setState({
@@ -301,7 +301,7 @@ class tikuguanli2 extends Component {
                     title: '',
                     datiTime: '',
                     totalNum: '',
-                    list:[]
+                    list: []
                 })
             }
         })
@@ -484,6 +484,16 @@ class tikuguanli2 extends Component {
             },
         });
     }
+    download = () => {
+        const self_paper_id = this.state.self_paper_id
+        const params = {
+            token:sessionStorage.getItem('token'),
+            self_paper_id
+        }
+        downLoadzujuan(params).then(res => {
+            console.log(res)
+        })
+    }
     render() {
         return (
             <div>
@@ -581,6 +591,7 @@ class tikuguanli2 extends Component {
                                     {this.state.params.is_open === 1 && this.state.params.status === 2 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 110, top: 10 }} type='danger'>删除组卷</Button> : ''}
                                     {this.state.params.is_open === 1 && this.state.params.status === -1 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 110, top: 10 }} type='danger'>删除组卷</Button> : ''}
                                     {this.state.title ? <Button onClick={this.linkPreview} style={{ position: 'absolute', right: 10, top: 10 }} type='primary'>预览试卷</Button> : ''}
+                                    {this.state.title ? <Button onClick={this.download} style={{ position: 'absolute', right: 10, top: 10 }} type='primary'>下载试卷</Button> : ''}
                                 </div>
                                 <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
                                 </List>

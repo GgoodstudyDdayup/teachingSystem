@@ -45,4 +45,5 @@ instance.interceptors.response.use(response => {
 });
 
 const loginPost = axios
-export { instance, loginPost } 
+const downLoad = axios
+export { instance, loginPost,downLoad } 

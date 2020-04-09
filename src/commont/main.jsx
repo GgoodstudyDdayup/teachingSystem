@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -25,6 +25,9 @@ import ZY from './zy'
 import Tkquestion from './tk/braftEditor'
 import Test from '../commont/tset/test'
 import Zj from './zhangjie'
+import ErrorSet from './wrongQuestions/errorSet/index'
+import ExerciseBook from './wrongQuestions/exerciseBook/index'
+import ReportForm from './wrongQuestions/reportForm/index'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -45,6 +48,7 @@ class main extends Component {
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
+        sessionStorage.setItem('enter', '')
         const children = this.state.company_list.map((res, index) => {
             return <Option key={res.company} value={res.company} >{res.company}</Option>
         })
@@ -54,6 +58,7 @@ class main extends Component {
     }
     componentWillUnmount() {
         // 移除监听事件
+
         window.removeEventListener('resize', this.handleSize);
 
     }
@@ -78,6 +83,7 @@ class main extends Component {
             sessionStorage.setItem("teacher_type", '')
             sessionStorage.setItem("permission", '')
             this.props.history.replace("/")
+            sessionStorage.setItem('enter', '')
             message.success(res.data.message)
         })
     }
@@ -203,6 +209,25 @@ class main extends Component {
                             {sessionStorage.getItem('teacher_type') === '4' ? '' : <Menu.Item key="7">
                                 <Link to="/main/bk/kejian">组卷审核</Link>
                             </Menu.Item>}
+                        </SubMenu>
+                        <SubMenu
+                            key="sub22"
+                            title={
+                                <span>
+                                    <RadarChartOutlined />
+                                    <span>错题管理</span>
+                                </span>
+                            }
+                        >
+                            <Menu.Item key="226">
+                                <Link to='/main/wrongQuestion/reportForm'>小亚报表</Link>
+                            </Menu.Item>
+                            <Menu.Item key="225">
+                                <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
+                            </Menu.Item>
+                            <Menu.Item key="227">
+                                <Link to='/main/wrongQuestion/exerciseBook'>小亚练习册</Link>
+                            </Menu.Item>
                         </SubMenu>
                         {/* <SubMenu
                             key="55"
@@ -368,7 +393,7 @@ class main extends Component {
                             background: '#fff',
                             minHeight: 280,
                         }}
-                        className={this.props.location.pathname === '/main/zujuan' ? 'conntent-none' : ''}
+                        className={this.props.location.pathname === '/main/zujuan' || this.props.location.pathname === '/main/wrongQuestion/reportForm' ? 'conntent-none' : ''}
                     >
                         <Switch>
                             {/* 题库管理 */}
@@ -395,15 +420,27 @@ class main extends Component {
                             <Route path="/main/bk/kejian" component={Kj} />
                             <Route path="/main/quanxian" component={Quanxian} />
                             <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
+                            {/* 错题管理 */}
+                            <Route path="/main/wrongQuestion/errorSet" component={ErrorSet} />
+                            <Route path="/main/wrongQuestion/exerciseBook" component={ExerciseBook} />
+
+
 
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>
+
                     </Content>
                     <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/zujuan' ? '' : 'conntent-none'}>
                         <Route path="/main/zujuan" component={Zujuan} />
                     </div>
+                    <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/wrongQuestion/reportForm' ? '' : 'conntent-none'}>
+                        <Route path="/main/wrongQuestion/reportForm" component={ReportForm} />
+                        
+                    </div>
+
                 </Layout>
+                
             </Layout >
 
         );

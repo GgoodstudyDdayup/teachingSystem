@@ -17,11 +17,15 @@ class Login extends Component {
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         document.addEventListener('keydown', this.keyDownLogin);
+        sessionStorage.setItem('enter', 1)
     }
     componentWillUnmount() {
         // 移除监听事件
         window.removeEventListener('resize', this.handleSize);
         window.removeEventListener('keydown', this.keyDownLogin);
+        this.setState = (state, callback) => {
+            return
+        }
     }
     // 自适应浏览器的高度
     handleSize = () => {
@@ -47,6 +51,15 @@ class Login extends Component {
                         sessionStorage.setItem("username", params.username)
                         sessionStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
                         sessionStorage.setItem("permission", res.data.data.user_info.permission)
+                        const save = {
+                            selectValue: [],//科目
+                            ques_type_id: [],//问题类型id
+                            ques_source: '',//试卷来源 
+                            ques_grade_id: [],//年级id
+                            ques_subject_id: [],//科目id
+                            ques_year: [],
+                        }
+                        sessionStorage.setItem('saveParams', JSON.stringify(save))
                         if (res.data.data.company_list !== null && res.data.data.company_list.length > 0) {
                             sessionStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
                             sessionStorage.setItem('company', res.data.data.company_list[0].company)
@@ -91,7 +104,7 @@ class Login extends Component {
         })
     }
     keyDownLogin = (e) => {
-        if (e.keyCode === 13) {
+        if (e.keyCode === 13 && sessionStorage.getItem('enter') === '1') {
             this.login()
         }
     }
