@@ -776,7 +776,7 @@
   margin-bottom: 0;
 }
 
-.m-pingxingTitle{
+.m-pingxingTitle {
   position: relative;
   display: inline-block;
   padding: .5em 1em;
@@ -785,12 +785,13 @@
   background: transparent;
   color: #fff;
   text-transform: uppercase;
-  text-decoration:none;
+  text-decoration: none;
   font-size: 20;
 }
-.m-pingxingTitle::before{
+
+.m-pingxingTitle::before {
   border-radius: 4px;
-  content:'';
+  content: '';
   position: absolute;
   top: 0;
   right: 0;

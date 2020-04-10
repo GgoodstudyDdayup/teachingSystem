@@ -17,7 +17,7 @@ class Login extends Component {
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         document.addEventListener('keydown', this.keyDownLogin);
-        sessionStorage.setItem('enter', 1)
+        localStorage.setItem('enter', 1)
     }
     componentWillUnmount() {
         // 移除监听事件
@@ -47,10 +47,10 @@ class Login extends Component {
                 message.success({
                     content: `${res.data.message}`,
                     onClose: () => {
-                        sessionStorage.setItem("token", res.data.data.user_info.token)
-                        sessionStorage.setItem("username", params.username)
-                        sessionStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
-                        sessionStorage.setItem("permission", res.data.data.user_info.permission)
+                        localStorage.setItem("token", res.data.data.user_info.token)
+                        localStorage.setItem("username", params.username)
+                        localStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
+                        localStorage.setItem("permission", res.data.data.user_info.permission)
                         const save = {
                             selectValue: [],//科目
                             ques_type_id: [],//问题类型id
@@ -59,11 +59,11 @@ class Login extends Component {
                             ques_subject_id: [],//科目id
                             ques_year: [],
                         }
-                        sessionStorage.setItem('saveParams', JSON.stringify(save))
+                        localStorage.setItem('saveParams', JSON.stringify(save))
                         if (res.data.data.company_list !== null && res.data.data.company_list.length > 0) {
-                            sessionStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
-                            sessionStorage.setItem('company', res.data.data.company_list[0].company)
-                            sessionStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
+                            localStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
+                            localStorage.setItem('company', res.data.data.company_list[0].company)
+                            localStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
                             this.props.history.push("/main")
                         } else {
                             get_company_list().then(l1 => {
@@ -74,9 +74,9 @@ class Login extends Component {
                                         }
                                         return item
                                     }, [])
-                                    sessionStorage.setItem("company_list", JSON.stringify(company_list))
-                                    sessionStorage.setItem('company', company_list[0].company)
-                                    sessionStorage.setItem('company_id', company_list[0].id)
+                                    localStorage.setItem("company_list", JSON.stringify(company_list))
+                                    localStorage.setItem('company', company_list[0].company)
+                                    localStorage.setItem('company_id', company_list[0].id)
                                     this.props.history.push("/main")
                                 } else {
                                     message.warning('系统繁忙请重试')
@@ -104,7 +104,7 @@ class Login extends Component {
         })
     }
     keyDownLogin = (e) => {
-        if (e.keyCode === 13 && sessionStorage.getItem('enter') === '1') {
+        if (e.keyCode === 13 && localStorage.getItem('enter') === '1') {
             this.login()
         }
     }

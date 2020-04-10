@@ -64,7 +64,7 @@ export default class EditorDemo extends React.Component {
                 ques_source_type_id: [],
                 ques_year: []
             },
-            saveParams: JSON.parse(sessionStorage.getItem('saveParams')) || {
+            saveParams: JSON.parse(localStorage.getItem('saveParams')) || {
                 selectValue: [],//科目
                 ques_subject_id: [],//科目id
                 ques_type_id: [],//问题类型id
@@ -212,8 +212,8 @@ export default class EditorDemo extends React.Component {
                     subject_list: res.data.subject_list
                 })
             }).then(() => {
-                if (JSON.parse(sessionStorage.getItem('saveParams')).selectValue.length > 1) {
-                    this.selectonChange(JSON.parse(sessionStorage.getItem('saveParams')).selectValue)
+                if (JSON.parse(localStorage.getItem('saveParams')).selectValue.length > 1) {
+                    this.selectonChange(JSON.parse(localStorage.getItem('saveParams')).selectValue)
                 }
             })
         }
@@ -313,12 +313,12 @@ export default class EditorDemo extends React.Component {
                 return item
             }, '')
             params.ques_subject_id = e[1]
-            if (JSON.parse(sessionStorage.getItem('saveParams')).selectValue.length > 1) {
-                params.ques_type_id = JSON.parse(sessionStorage.getItem('saveParams')).ques_type_id
-                params.ques_grade_id = JSON.parse(sessionStorage.getItem('saveParams')).ques_grade_id
-                params.ques_year = JSON.parse(sessionStorage.getItem('saveParams')).ques_year
-                // params.ques_source = JSON.parse(sessionStorage.getItem('saveParams')).ques_source
-                params.ques_source_type_id = JSON.parse(sessionStorage.getItem('saveParams')).ques_source_type_id
+            if (JSON.parse(localStorage.getItem('saveParams')).selectValue.length > 1) {
+                params.ques_type_id = JSON.parse(localStorage.getItem('saveParams')).ques_type_id
+                params.ques_grade_id = JSON.parse(localStorage.getItem('saveParams')).ques_grade_id
+                params.ques_year = JSON.parse(localStorage.getItem('saveParams')).ques_year
+                // params.ques_source = JSON.parse(localStorage.getItem('saveParams')).ques_source
+                params.ques_source_type_id = JSON.parse(localStorage.getItem('saveParams')).ques_source_type_id
                 const typeName = res.data.ques_type_rela_list.reduce((item, res) => {
                     if (params.ques_type_id === res.ques_type_id) {
                         item = res.name
@@ -740,7 +740,7 @@ export default class EditorDemo extends React.Component {
                 message.warning('请补全下拉框信息')
                 return
             } else {
-                sessionStorage.setItem('saveParams', JSON.stringify(saveParams))
+                localStorage.setItem('saveParams', JSON.stringify(saveParams))
                 message.success('保存成功')
             }
         } else {
@@ -752,7 +752,7 @@ export default class EditorDemo extends React.Component {
                 ques_subject_id: [],//科目id
                 ques_year: [],
             }
-            sessionStorage.setItem('saveParams', JSON.stringify(save))
+            localStorage.setItem('saveParams', JSON.stringify(save))
             message.success('取消保存')
         }
         this.setState({

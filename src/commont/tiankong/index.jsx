@@ -74,9 +74,9 @@ export default class UploadDemo extends React.Component {
             multiple: true,
             name: 'upload_control',
             headers: {
-                token: sessionStorage.getItem("token"),
-                username: sessionStorage.getItem("username"),
-                companyid: sessionStorage.getItem("companyid"),
+                token: localStorage.getItem("token"),
+                username: localStorage.getItem("username"),
+                companyid: localStorage.getItem("companyid"),
 
             },
             data: {
@@ -109,9 +109,9 @@ export default class UploadDemo extends React.Component {
             multiple: true,
             name: 'upload_control',
             headers: {
-                token: sessionStorage.getItem("token"),
-                username: sessionStorage.getItem("username"),
-                companyid: sessionStorage.getItem("companyid"),
+                token: localStorage.getItem("token"),
+                username: localStorage.getItem("username"),
+                companyid: localStorage.getItem("companyid"),
             },
             data: {
                 type: 1

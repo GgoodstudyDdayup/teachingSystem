@@ -23,9 +23,9 @@ const instance = axios.create({
     // withCredentials: true
 })
 instance.interceptors.request.use(function (config) {
-    config.headers['username'] = sessionStorage.getItem("username")
-    config.headers['token'] = sessionStorage.getItem("token")
-    config.headers['companyid'] = sessionStorage.getItem("company_id")
+    config.headers['username'] = localStorage.getItem("username")
+    config.headers['token'] = localStorage.getItem("token")
+    config.headers['companyid'] = localStorage.getItem("company_id")
     NProgress.start()
     return config
 }, function (error) {

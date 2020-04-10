@@ -487,7 +487,7 @@ class tikuguanli2 extends Component {
     download = () => {
         const self_paper_id = this.state.self_paper_id
         const params = {
-            token:sessionStorage.getItem('token'),
+            token: localStorage.getItem('token'),
             self_paper_id
         }
         downLoadzujuan(params).then(res => {
@@ -587,11 +587,11 @@ class tikuguanli2 extends Component {
                                             <div className="set-item">姓名：<span className="line"></span></div>
                                         </div>
                                     </div>
-                                    {this.state.params.is_open !== 1 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 110, top: 10 }} type='danger'>删除组卷</Button> : ''}
+                                    {this.state.params.is_open !== 1 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 210, top: 10 }} type='danger'>删除组卷</Button> : ''}
                                     {this.state.params.is_open === 1 && this.state.params.status === 2 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 110, top: 10 }} type='danger'>删除组卷</Button> : ''}
                                     {this.state.params.is_open === 1 && this.state.params.status === -1 && this.state.title ? <Button onClick={this.deleteZj} style={{ position: 'absolute', right: 110, top: 10 }} type='danger'>删除组卷</Button> : ''}
                                     {this.state.title ? <Button onClick={this.linkPreview} style={{ position: 'absolute', right: 10, top: 10 }} type='primary'>预览试卷</Button> : ''}
-                                    {this.state.title ? <Button onClick={this.download} style={{ position: 'absolute', right: 10, top: 10 }} type='primary'>下载试卷</Button> : ''}
+                                    {this.state.title ? <Button onClick={this.download} style={{ position: 'absolute', right: 110, top: 10 }} type='primary'>下载试卷</Button> : ''}
                                 </div>
                                 <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
                                 </List>

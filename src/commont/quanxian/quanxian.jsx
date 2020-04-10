@@ -65,10 +65,10 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-        if (sessionStorage.getItem('permission') === '1' || sessionStorage.getItem('permission') === '2') {
+        if (localStorage.getItem('permission') === '1' || localStorage.getItem('permission') === '2') {
             quanxianList().then(res => {
                 let permission = res.data.list
-                if (sessionStorage.getItem('permission') === '2') {
+                if (localStorage.getItem('permission') === '2') {
                     const newPermission = permission.reduce((item, res) => {
                         if (res.id !== '1' && res.id !== '2') {
                             item.push(res)
@@ -662,7 +662,7 @@ class bk extends Component {
         })
     }
     quanxianAction = e => {
-        if (sessionStorage.getItem('permission') === '1') {
+        if (localStorage.getItem('permission') === '1') {
             if (e.permission === '1') {
                 const btnPermission = (
                     <div>
@@ -681,12 +681,12 @@ class bk extends Component {
                 )
                 return btnPermission
             }
-        } else if (sessionStorage.getItem('permission') === '2') {
+        } else if (localStorage.getItem('permission') === '2') {
             if (e.permission === '1') {
                 return <Tag color='volcano' >暂无权限</Tag>
-            } else if (e.permission === '2' && e.username !== sessionStorage.getItem('username')) {
+            } else if (e.permission === '2' && e.username !== localStorage.getItem('username')) {
                 return <Tag color='volcano' >暂无权限</Tag>
-            } else if (e.permission === '2' && e.username === sessionStorage.getItem('username')) {
+            } else if (e.permission === '2' && e.username === localStorage.getItem('username')) {
                 const btnPermission = (
                     <div>
                         <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
@@ -990,7 +990,7 @@ class bk extends Component {
                 </div>
                 <div className="m-bottom m-flex">
                     <Button type="primary" onClick={this.showModal}>添加账号</Button>
-                    {sessionStorage.getItem('permission') === '1' ? <Button className="m-left" type="primary" onClick={this.schoolSet}>跨校区账号设置</Button> : ''}
+                    {localStorage.getItem('permission') === '1' ? <Button className="m-left" type="primary" onClick={this.schoolSet}>跨校区账号设置</Button> : ''}
                 </div>
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
                 <Pagination className="m-Pleft" current={this.state.parmas.page} onChange={this.changePage} total={this.state.totalCount} />

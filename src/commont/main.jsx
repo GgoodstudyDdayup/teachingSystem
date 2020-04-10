@@ -41,14 +41,14 @@ class main extends Component {
             visible: false,
             newPassword: '',
             oldPassword: '',
-            company_list: JSON.parse(sessionStorage.getItem('company_list')),
-            company_name: sessionStorage.getItem('company')
+            company_list: JSON.parse(localStorage.getItem('company_list')),
+            company_name: localStorage.getItem('company')
         }
     }
     componentDidMount() {
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
-        sessionStorage.setItem('enter', '')
+        localStorage.setItem('enter', '')
         const children = this.state.company_list.map((res, index) => {
             return <Option key={res.company} value={res.company} >{res.company}</Option>
         })
@@ -78,12 +78,12 @@ class main extends Component {
     logOut = () => {
         logout().then(res => {
             console.log(res)
-            sessionStorage.setItem("token", '')
-            sessionStorage.setItem("username", '')
-            sessionStorage.setItem("teacher_type", '')
-            sessionStorage.setItem("permission", '')
+            localStorage.setItem("token", '')
+            localStorage.setItem("username", '')
+            localStorage.setItem("teacher_type", '')
+            localStorage.setItem("permission", '')
             this.props.history.replace("/")
-            sessionStorage.setItem('enter', '')
+            localStorage.setItem('enter', '')
             message.success(res.data.message)
         })
     }
@@ -133,8 +133,8 @@ class main extends Component {
         if (e) {
             company_list.forEach((res) => {
                 if (res.company === e) {
-                    sessionStorage.setItem('company_id', res.company_id)
-                    sessionStorage.setItem('company', res.company)
+                    localStorage.setItem('company_id', res.company_id)
+                    localStorage.setItem('company', res.company)
                     window.location.reload()
                 }
             })
@@ -206,7 +206,7 @@ class main extends Component {
                             <Menu.Item key="6">
                                 <Link to="/main/bk/prograss">审核进度</Link>
                             </Menu.Item>
-                            {sessionStorage.getItem('teacher_type') === '4' ? '' : <Menu.Item key="7">
+                            {localStorage.getItem('teacher_type') === '4' ? '' : <Menu.Item key="7">
                                 <Link to="/main/bk/kejian">组卷审核</Link>
                             </Menu.Item>}
                         </SubMenu>
@@ -312,7 +312,7 @@ class main extends Component {
                                 <Link to="/main/zhangjie">章节知识点关联</Link>
                             </Menu.Item>
                         </SubMenu>
-                        {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ? <SubMenu
+                        {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2' ? <SubMenu
                             key="sub5"
                             title={
                                 <span>
@@ -340,7 +340,7 @@ class main extends Component {
                                 type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                                 onClick={this.toggle}
                             />
-                            {sessionStorage.getItem("permission") === '1' || sessionStorage.getItem("permission") === '2' ?
+                            {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2' ?
                                 <span>
                                     <Select style={{ width: 170 }} showSearch optionFilterProp="children" onChange={this.selsectCompany} value={this.state.company_name} placeholder="请选择校区" >
                                         {this.state.children}
@@ -360,7 +360,7 @@ class main extends Component {
                             <div style={{ width: 30 }}></div>
                             <Dropdown overlay={menu}>
                                 <div>
-                                    {sessionStorage.getItem('username')}
+                                    {localStorage.getItem('username')}
                                 </div>
                             </Dropdown>
                             <Modal

@@ -6,10 +6,11 @@ const Preview = (props) => {
     const [total_minute, setTotal_minute] = useState('')
     const [title, setTitle] = useState('')
     const [qusetionList, setquestionList] = useState([])
-    const self_paper_id = props.history.location.search.split('=')[1]
+    const self_paper_id = props.history.location.search.split('=')[1].split('&')[0]
+    // 这个是token
+    // console.log(props.history.location.search.split('=')[2])
     useEffect(() => {
         get_self_paperinfo({ self_paper_id: self_paper_id }).then(res => {
-            console.log(res)
             setScore(res.data.model.score)
             setTotal_minute(res.data.model.total_minute)
             setTitle(res.data.model.title)

@@ -1,7 +1,7 @@
 import React from 'react';
 import List from './previewList'
 const Preview = (props) => {
-    const previewData = JSON.parse(sessionStorage.getItem('previewData'))
+    const previewData = JSON.parse(localStorage.getItem('previewData'))
     return (
         <div>
             <div >
