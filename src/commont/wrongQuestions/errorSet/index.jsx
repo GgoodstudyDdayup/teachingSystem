@@ -11,7 +11,6 @@ import { HighlightOutlined, DeleteOutlined } from '@ant-design/icons'
 const { TabPane } = Tabs
 const { Meta } = Card;
 const { Option } = Select
-
 const Main = (props) => {
     const params = {
         student: '',
@@ -98,10 +97,8 @@ const Main = (props) => {
     const cancel = e => {
         setVisible(false)
     };
-
     useEffect(() => {
     })
-
     return (
         <div>
             <Drawer

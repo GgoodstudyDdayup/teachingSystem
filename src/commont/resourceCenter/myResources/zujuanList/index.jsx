@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { message, BackTop, Result, Select, Radio, Icon, Badge, Tabs, Button, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import Md5 from 'js-md5'
 import Know from '../../../bk/kejianKnowList'
 import List from '../../../tk/jigouList'
 import { downLoadzujuan, del_self_paper, get_own_subject_list, get_grade_list, get_list, get_self_paper_question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../../../axios/http'
@@ -437,7 +438,9 @@ class tikuguanli2 extends Component {
         })
     }
     linkPreview = () => {
-        window.open(`/#/preview?self_paper_id=${this.state.self_paper_id}`)
+        const date = new Date()
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
+        window.open(`/node/build/#/preview?self_paper_id=${this.state.self_paper_id}&token=${Md5(ymdh)}`)
     }
     deleteZj = () => {
         const self_paper_id = this.state.self_paper_id
@@ -485,14 +488,14 @@ class tikuguanli2 extends Component {
         });
     }
     download = () => {
-        const self_paper_id = this.state.self_paper_id
-        const params = {
-            token: localStorage.getItem('token'),
-            self_paper_id
+        const date = new Date()
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
+        const param = {
+            token: Md5(ymdh),
+            self_paper_id: this.state.self_paper_id
         }
-        downLoadzujuan(params).then(res => {
-            console.log(res)
-        })
+        window.open(`http://devjiaoxueapi.yanuojiaoyu.com//api/download/self_paper?self_paper_id=${param.self_paper_id}&token=${param.token}`)
+
     }
     render() {
         return (

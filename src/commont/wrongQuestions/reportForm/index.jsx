@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Table } from 'antd';
+import { Table, Descriptions, Badge } from 'antd';
 const columns = [
     {
         title: '章节名称',
@@ -50,6 +50,13 @@ const columns = [
                 width: 200,
                 align: 'center',
             },
+            {
+                title: 'L5',
+                dataIndex: 'companyAddress',
+                key: 'companyAddress',
+                width: 200,
+                align: 'center',
+            },
         ],
     },
 ];
@@ -74,7 +81,17 @@ const Main = (props) => {
 
     })
     return (
-        <div style={{ background: '#fff',marginBottom:24 ,padding:24}}>
+        <div style={{ background: '#fff', marginBottom: 24, padding: 24 }}>
+            <Descriptions title="小亚报表" bordered>
+                <Descriptions.Item label="姓名">Cloud Database</Descriptions.Item>
+                <Descriptions.Item label="科目">Prepaid</Descriptions.Item>
+                <Descriptions.Item label="班级">YES</Descriptions.Item>
+                <Descriptions.Item label="报告日期" span={3}>
+                    <Badge status="processing" text="2018-04-24 18:00:00" />
+                </Descriptions.Item>
+            </Descriptions>
+
+
             {formTitle.map(res =>
                 <div key={res.name}>
                     <div className="m-pingxingTitle m-left">

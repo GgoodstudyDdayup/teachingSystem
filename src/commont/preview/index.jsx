@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { get_self_paperinfo } from '../../axios/http'
 import List from './previewList'
 const Preview = (props) => {
@@ -7,18 +7,23 @@ const Preview = (props) => {
     const [title, setTitle] = useState('')
     const [qusetionList, setquestionList] = useState([])
     const self_paper_id = props.history.location.search.split('=')[1].split('&')[0]
+    const token = props.history.location.search.split('=')[2]
     // 这个是token
     // console.log(props.history.location.search.split('=')[2])
     useEffect(() => {
-        get_self_paperinfo({ self_paper_id: self_paper_id }).then(res => {
+        const param = {
+            token,
+            self_paper_id
+        }
+        get_self_paperinfo(param).then(res => {
             setScore(res.data.model.score)
             setTotal_minute(res.data.model.total_minute)
             setTitle(res.data.model.title)
             setquestionList(res.data.list)
         })
-    }, [self_paper_id])
+    }, [self_paper_id, token])
     return (
-        <div>
+        <div >
             <div >
                 <div className='paper-hd-title' style={{ background: '#fff', flex: 1 }} >
                     <h3>{title}</h3>
