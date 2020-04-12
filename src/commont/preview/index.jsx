@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { get_self_paperinfo } from '../../axios/http'
 import List from './previewList'
 const Preview = (props) => {

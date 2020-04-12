@@ -440,7 +440,7 @@ class tikuguanli2 extends Component {
     linkPreview = () => {
         const date = new Date()
         const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
-        window.open(`/node/build/#/preview?self_paper_id=${this.state.self_paper_id}&token=${Md5(ymdh)}`)
+        window.open(`/#/preview?self_paper_id=${this.state.self_paper_id}&token=${Md5(ymdh)}`)
     }
     deleteZj = () => {
         const self_paper_id = this.state.self_paper_id

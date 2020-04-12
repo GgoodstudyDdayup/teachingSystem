@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -225,10 +225,13 @@ class main extends Component {
                             <Menu.Item key="225">
                                 <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
                             </Menu.Item>
-                            <Menu.Item key="227">
-                                <Link to='/main/wrongQuestion/exerciseBook'>小亚练习册</Link>
-                            </Menu.Item>
                         </SubMenu>
+                        <Menu.Item key="227">
+                            <ContainerOutlined />
+                            <span>小亚练习册
+                            </span>
+                            <Link to='/main/wrongQuestion/exerciseBook'></Link>
+                        </Menu.Item>
                         {/* <SubMenu
                             key="55"
                             title={
@@ -436,11 +439,10 @@ class main extends Component {
                     </div>
                     <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/wrongQuestion/reportForm' ? '' : 'conntent-none'}>
                         <Route path="/main/wrongQuestion/reportForm" component={ReportForm} />
-                        
                     </div>
 
                 </Layout>
-                
+
             </Layout >
 
         );
