@@ -261,3 +261,27 @@ export const get_knowledge_by_section_id = (params) => {
     return instance.post('/api/system/get_knowledge_by_section_id', params)
 }
 
+//获取校管家科目
+export const get_xiaoguanjia_subject = () => {
+    return instance.get('/api/wrong/get_xiaoguanjia_subject')
+}
+//获取校管家科目
+export const get_xiaoguanjia_grade = () => {
+    return instance.get('/api/wrong/get_xiaoguanjia_grade')
+}
+// 根据科目、年级选择校管家对应的班级
+export const get_xiaoguanjia_class = (params) => {
+    return instance.post('/api/wrong/get_xiaoguanjia_class', params)
+}
+//根据班级id获取校管家的学生
+export const get_xiaoguanjia_student = (params) => {
+    return instance.post('/api/wrong/get_xiaoguanjia_student', params)
+}
+//提交错题
+export const submit_wrong_question = (params) => {
+    return instance.post('/api/wrong/submit_wrong_question', params)
+}
+//查询所有错题
+export const wrong_get_list = (params) => {
+    return instance.post('/api/wrong/get_list', params)
+}

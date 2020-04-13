@@ -51,6 +51,7 @@ class Login extends Component {
                         localStorage.setItem("username", params.username)
                         localStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
                         localStorage.setItem("permission", res.data.data.user_info.permission)
+                        localStorage.setItem("id", res.data.data.user_info.id)
                         const save = {
                             selectValue: [],//科目
                             ques_type_id: [],//问题类型id
