@@ -285,3 +285,23 @@ export const submit_wrong_question = (params) => {
 export const wrong_get_list = (params) => {
     return instance.post('/api/wrong/get_list', params)
 }
+//查询单个错题
+export const get_detail = (params) => {
+    return instance.post('/api/wrong/get_detail', params)
+}
+//删除错题
+export const del_wrong_question = (params) => {
+    return instance.post('/api/wrong/del_wrong_question', params)
+}
+//获取解析的选项
+export const get_analysis_option = (params) => {
+    return instance.post('/api/wrong/get_analysis_option', params)
+}
+//根据章节模块跟知识点对应关系
+export const get_knowledge = (params) => {
+    return instance.post('/api/system/get_knowledge_by_section_id', params)
+}
+//错题解析
+export const analysis_question = (params) => {
+    return instance.post('/api/wrong/analysis_question', params)
+}

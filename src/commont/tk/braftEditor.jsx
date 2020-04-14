@@ -5,8 +5,8 @@ import JieD from '../jieda/index'
 import Choose from '../choose/index'
 import PanD from '../panduan/index'
 import SelectA from './selection'
-import store from '../../store/index'
 import Tree from './editorTree'
+import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 import { subjectList, tkList, tree, add_question, get_questioninfo, edit_question_question } from '../../axios/http'
 import { Select, Divider, Radio, Input, Modal, Button, message } from 'antd'
@@ -552,8 +552,6 @@ export default class EditorDemo extends React.Component {
             params
         })
     }
-
-
     showModal = () => {
         if (this.state.tree.length > 0) {
             this.setState({

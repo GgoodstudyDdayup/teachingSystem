@@ -6,17 +6,19 @@ import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import Finished from './finished'
-import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student, loginUserList, submit_wrong_question, wrong_get_list } from '../../../axios/http'
+import { analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student, loginUserList, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
 const { TabPane } = Tabs
 const { Option } = Select
 const { TextArea } = Input
+const { confirm } = Modal
 const Main = (props) => {
     //搜索
     const params = {
         xiaoguanjia_subject_id: [],
         xiaoguanjia_grade_id: [],
         xiaoguanjia_class_id: [],
-        xiaoguanjia_student_id: [],
+        student: '',
+        submit_teacher_id: '',
         analysis_teacher_id: localStorage.getItem('id'),
         state: -1,
         pagesize: 10,
@@ -27,17 +29,26 @@ const Main = (props) => {
         xiaoguanjia_subject_id: [],
         xiaoguanjia_grade_id: [],
         xiaoguanjia_class_id: [],
-        xiaoguanjia_student_id: [],
+        xiaoguanjia_student_ids: [],
         analysis_teacher_id: [],
         image: '',
         text: ''
     }
     //点评
     const drawerParams = {
-        student: '',
-        finished: '1',
-
+        id: '',
+        ques_type_id: [],
+        source_id: [],
+        section_id: [],
+        analysis_content: '',
+        mastery_level: '',
+        ques_difficulty_id: '',
+        knowledge_ids: [],
+        wrong_reason_id: [],
+        upload_channel_id: 1
     }
+    let list = []
+    let count = 0
     const editorState = BraftEditor.createEditorState(null)
     const [visible, setVisible] = useState(false)
     const [paramResult, setParams] = useState(params)
@@ -47,12 +58,70 @@ const Main = (props) => {
     const [subjectchildren, setSubjectchildren] = useState('')
     const [gradechildren, setGradechildren] = useState('')
     const [classchildren, setClasschildren] = useState('')
-    const [studentchildren, setStudentchildren] = useState('')
     const [teacherchildren, setTeacherchildren] = useState('')
     const [height, setHeight] = useState('')
     const [visible2, setVisible2] = useState(false)
+    const [dataList, setDataList] = useState(list)
+    const [totalCount, setTotalCount] = useState(count)
+    const [tixingOptions, setTixingOptions] = useState([])
+    const [sourceOptions, setSourceOptions] = useState([])
+    const [wrong_reasonOptions, setWrong_reasonOptions] = useState([])
+    const [drawerImage, setDrawerImage] = useState('')
+    const [drawerText, setDrawerText] = useState('')
+    const [pubildzjList, setPubilcZjList] = useState([])
+    const [zjList, setZjList] = useState([])
+    const [zjChildrenList, setZjChildrenList] = useState([])
+    const [knowlageList, setKnowlageList] = useState([])
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+
+    useEffect(() => {
+        setHeight(document.body.clientHeight)
+    }, [height])
+    //获取默认的学科和年级数据
+    useEffect(() => {
+
+        wrong_get_list({
+            xiaoguanjia_subject_id: '',
+            xiaoguanjia_grade_id: '',
+            xiaoguanjia_class_id: '',
+            xiaoguanjia_student_ids: '',
+            analysis_teacher_id: localStorage.getItem('id'),
+            state: -1,
+            pagesize: 10,
+            page: 1
+        }).then(res => {
+            setTotalCount(Number(res.data.count))
+            setDataList([...res.data.list])
+        })
+        get_xiaoguanjia_subject().then(res => {
+            const subjectchildren = res.data.list.map(res => {
+                const value = res.value.split('-')[1]
+                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
+            })
+            setSubjectchildren([...subjectchildren])
+        })
+        get_xiaoguanjia_grade().then(res => {
+            const gradechildren = res.data.list.map(res => {
+                const value = res.value.split('-')[1]
+                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
+            })
+            setGradechildren([...gradechildren])
+        })
+        loginUserList({
+            name: '',
+            username: '',
+            permission: '',
+            page_size: 100,
+        }).then(res => {
+            const teachChildren = res.data.list.map(res => {
+                return <Option key={res.id} value={res.id} >{res.name}</Option>
+            })
+            setTeacherchildren([...teachChildren])
+        })
+    }, [])
     const handleChange = (editorState) => {
+        drawerParamResult.analysis_content = editorState.toHTML()
+        setDrawerParam({ ...drawerParamResult })
         setEditorState(editorState)
     }
     const handleChange2 = (e) => {
@@ -61,6 +130,8 @@ const Main = (props) => {
                 type: 'IMAGE',
                 url: e.file.response.data.full_path
             }])
+            drawerParamResult.analysis_content = result.toHTML()
+            setDrawerParam({ ...drawerParamResult })
             setEditorState(result)
         } else {
             return false
@@ -100,34 +171,82 @@ const Main = (props) => {
             )
         }
     ]
-    const changName = (e) => {
-        paramResult.student = e.target.value
-        setParams({ ...paramResult })
-    }
     const search = () => {
         wrong_get_list(paramResult).then(res => {
-            console.log(res)
+            if (res.code === 0) {
+                list = res.data.list
+                count = Number(res.data.count)
+                setTotalCount(count)
+                setDataList([...list])
+            }
         })
     }
     const ok = () => {
-        setVisible(true)
+        analysis_question(drawerParamResult).then(res => {
+            if (res.code === 0) {
+                const drawerParamResult = {
+                    id: '',
+                    ques_type_id: [],
+                    source_id: [],
+                    section_id: [],
+                    analysis_content: '',
+                    mastery_level: '',
+                    ques_difficulty_id: '',
+                    knowledge_ids: [],
+                    wrong_reason_id: [],
+                    upload_channel_id: 1
+                }
+                message.success(res.message)
+                setDrawerParam({ ...drawerParamResult })
+                setVisible(false)
+                setEditorState(BraftEditor.createEditorState(null))
+                search()
+            } else {
+                message.error(res.message)
+            }
+        })
     }
-    const showModal = () => {
-        setVisible(true)
-    };
+    const detail = (id, image, text) => {
+        drawerParamResult['id'] = id
+        setDrawerParam({ ...drawerParamResult })
+        setDrawerImage(image)
+        setDrawerText(text)
+        get_analysis_option({ id }).then(res => {
+            if (res.code === 0) {
+                const tixingOptions = res.data.type_list.map((res, index) => {
+                    return <Option key={res.ques_type_id} value={res.ques_type_id} >{res.name}</Option>
+                })
+                const zhangjie = res.data.course_section_list.map(l1 => {
+                    return <Option value={l1.section_id} key={l1.section_id}>{l1.section_name}</Option>
+                })
+                const wrong_reason = res.data.wrong_reason_list.map((res, index) => {
+                    return <Option key={res.name} value={res.id} >{res.name}</Option>
+                })
+                const source = res.data.source_list.map((res, index) => {
+                    return <Option key={res.name} value={res.id} >{res.name}</Option>
+                })
+                setPubilcZjList(res.data.course_section_list)
+                setTixingOptions([...tixingOptions])
+                setSourceOptions([...source])
+                setWrong_reasonOptions([...wrong_reason])
+                setZjList([...zhangjie])
+                setVisible(true)
+            }
+        })
+    }
     const showModal2 = () => {
         setVisible2(true)
     };
     const modalOk = params => {
-        const studentString = params.xiaoguanjia_student_id.reduce((item, res) => {
+        const studentString = params.xiaoguanjia_student_ids.reduce((item, res) => {
             item += res + ','
             return item
         }, '')
-        params.xiaoguanjia_student_id = studentString
+        params.xiaoguanjia_student_ids = studentString
         submit_wrong_question(params).then(res => {
             if (res.code === 0) {
                 message.success(res.message)
-
+                search()
                 modalCancel()
             } else {
                 message.error(res.message)
@@ -140,53 +259,38 @@ const Main = (props) => {
     };
     const cancel = e => {
         setVisible(false)
+        const drawerParamResult = {
+            id: '',
+            ques_type_id: [],
+            source_id: [],
+            section_id: [],
+            analysis_content: '',
+            mastery_level: '',
+            ques_difficulty_id: '',
+            knowledge_ids: [],
+            wrong_reason_id: [],
+            upload_channel_id: 1
+        }
+        setEditorState(BraftEditor.createEditorState(null))
+        setDrawerParam({ ...drawerParamResult })
     };
-    useEffect(() => {
-        setHeight(document.body.clientHeight)
-    }, [height])
-    //获取默认的学科和年级数据
-    useEffect(() => {
+    const getList = (page) => {
         wrong_get_list({
             xiaoguanjia_subject_id: '',
             xiaoguanjia_grade_id: '',
             xiaoguanjia_class_id: '',
-            xiaoguanjia_student_id: '',
+            xiaoguanjia_student_ids: '',
             analysis_teacher_id: localStorage.getItem('id'),
             state: -1,
             pagesize: 10,
             page: 1
         }).then(res => {
-            console.log(res.data.list)
+            setTotalCount(Number(res.data.count))
+            setDataList([...res.data.list])
         })
-        get_xiaoguanjia_subject().then(res => {
-            const subjectchildren = res.data.list.map(res => {
-                const value = res.value.split('-')[1]
-                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
-            })
-            setSubjectchildren([...subjectchildren])
-        })
-        get_xiaoguanjia_grade().then(res => {
-            const gradechildren = res.data.list.map(res => {
-                const value = res.value.split('-')[1]
-                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
-            })
-            setGradechildren([...gradechildren])
-        })
-        loginUserList({
-            name: '',
-            username: '',
-            permission: '',
-            page_size: 100,
-        }).then(res => {
-            const teachChildren = res.data.list.map(res => {
-                return <Option key={res.id} value={res.id} >{res.name}</Option>
-            })
-            setTeacherchildren([...teachChildren])
-        })
-    }, [])
+    }
     const changePage = (e) => {
-        paramResult.page = e
-        setParams({ ...paramResult })
+        getList(e)
     }
     const paramsSelect = (e, res) => {
         paramResult[res] = e
@@ -200,21 +304,76 @@ const Main = (props) => {
         }
         setParams({ ...paramResult })
     }
-    //modal选择下拉框班级时的操作
+    //选择下拉框班级时的操作
     const paramsclassChange = e => {
-        get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
-            const studentchildren = res.data.list.map(l1 => {
-                return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
-            })
-            paramResult.xiaoguanjia_class_id = e
-            setParams({ ...paramResult })
-            setStudentchildren(studentchildren)
+        paramResult.xiaoguanjia_class_id = e
+        setParams({ ...paramResult })
+    }
+    const paramsstudentChange = e => {
+        console.log(e.target.value)
+        paramResult.student = e.target.value
+        setParams({ ...paramResult })
+    }
+    const deleteI = e => {
+        const id = e
+        confirm({
+            title: `删除错题`,
+            content: '你确定要删除吗',
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+                del_wrong_question({ id }).then(res => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                        wrong_get_list(paramResult).then(res => {
+                            setTotalCount(Number(res.data.count))
+                            setDataList(res.data.list)
+                        })
+                    } else {
+                        message.error(res.message)
+                    }
+                })
+            },
+            onCancel() {
+            },
+        });
+
+    }
+
+    const drawerChange = (e, res) => {
+        drawerParamResult[res] = e
+        setDrawerParam({ ...drawerParamResult })
+    }
+    const radioChange = (e, res) => {
+        drawerParamResult[res] = e.target.value
+        setDrawerParam({ ...drawerParamResult })
+    }
+    const selsectzhangjie = e => {
+        pubildzjList.forEach(res => {
+            if (res.section_id === e) {
+                const zhangjieChildren = res.children.map(l1 => {
+                    return <Option value={l1.section_id} key={l1.section_id}>{l1.section_name}</Option>
+                })
+                setZjChildrenList(zhangjieChildren)
+            }
         })
     }
-    //modal选择下拉框选择学生时的操作
-    const paramsstudentChange = e => {
-        paramResult.xiaoguanjia_student_id = e
-        setParams({ ...paramResult })
+    const selsectzhangjieChildren = e => {
+        get_knowledge({ section_id: e }).then(res => {
+            if (res.code === 0) {
+                const knowlageList = res.data.list.map(l1 => {
+                    return <Option value={l1.knowledge_id} key={l1.knowledge_id}>{l1.knowledge_name}</Option>
+                })
+                drawerParamResult.section_id = e
+                setKnowlageList([...knowlageList])
+                setDrawerParam({ ...drawerParamResult })
+            }
+        })
+    }
+    const knowlageChange = e => {
+        drawerParamResult.knowledge_ids = e
+        setDrawerParam({ ...drawerParamResult })
     }
     return (
         <div>
@@ -227,32 +386,70 @@ const Main = (props) => {
                 visible={visible}
                 bodyStyle={{ paddingBottom: 80 }}
             >
-                <Zmage style={{ width: 200, height: 200 }} alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+                <div className=" m-bottom m-flex">
+                    <Zmage style={{ width: 200, height: 200 }} alt="example" src={drawerImage} />
+                    <span>{drawerText}</span>
+                </div>
                 <Row gutter={16}>
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>题型</span>
-                            <Select placeholder="请选择题型"></Select>
+                            <Select placeholder="请选择题型" onChange={(e) => drawerChange(e, 'ques_type_id')} value={drawerParamResult.ques_type_id}>
+                                {tixingOptions}
+                            </Select>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
-                            <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>来源</span>
-                            <Select placeholder="请选择来源"></Select>
+                            <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>题目来源</span>
+                            <Select placeholder="请选择来源" onChange={(e) => drawerChange(e, 'source_id')} value={drawerParamResult.source_id}>
+                                {sourceOptions}
+                            </Select>
                         </div>
                     </Col>
+                    {/* <Col span={12}>
+                        <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
+                            <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>上传渠道</span>
+                            <Select placeholder="请选择上传渠道" onChange={(e) => drawerChange(e, 'upload_channel_id')} value={drawerParamResult.upload_channel_id}>
+                                {upload_channelOptions}
+                            </Select>
+                        </div>
+                    </Col> */}
                 </Row>
                 <Row gutter={16}>
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
+                            <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>错误原因</span>
+                            <Select placeholder="请选择错误原因" onChange={(e) => drawerChange(e, 'wrong_reason_id')} value={drawerParamResult.wrong_reason_id}>
+                                {wrong_reasonOptions}
+                            </Select>
+                        </div>
+                    </Col>
+                    <Col span={12}>
+                        <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
+                            <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>学期</span>
+                            <Select placeholder="请选择学期" onChange={selsectzhangjie} >
+                                {zjList}
+                            </Select>
+                        </div>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+
+                    <Col span={12}>
+                        <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>章节</span>
-                            <Select placeholder="请选择题型"></Select>
+                            <Select placeholder="请选择章节" onChange={selsectzhangjieChildren} value={drawerParamResult.section_id}>
+                                {zjChildrenList}
+                            </Select>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>知识点</span>
-                            <Select placeholder="请选择来源"></Select>
+                            <Select placeholder="请选择知识点" onChange={knowlageChange} mode="multiple" optionFilterProp="children" showSearch value={drawerParamResult.knowledge_ids}>
+                                {knowlageList}
+                            </Select>
                         </div>
                     </Col>
                 </Row>
@@ -260,7 +457,7 @@ const Main = (props) => {
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>掌握程度</span>
-                            <Radio.Group defaultValue="a" value={paramResult.finished} >
+                            <Radio.Group defaultValue="a" onChange={(e) => radioChange(e, 'ques_difficulty_id')} value={drawerParamResult.ques_difficulty_id}>
                                 <Radio value="1">完全不会</Radio>
                                 <Radio value="2">掌握较差</Radio>
                                 <Radio value="3">基本掌握</Radio>
@@ -272,9 +469,9 @@ const Main = (props) => {
                     <Col span={12}>
                         <div className="m-flex m-bottom" style={{ flexFlow: 'column' }}>
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>难易程度</span>
-                            <Radio.Group defaultValue="a" value={paramResult.finished} >
+                            <Radio.Group defaultValue="a" onChange={(e) => radioChange(e, 'mastery_level')} value={drawerParamResult.mastery_level}>
                                 <Radio value="1">简单</Radio>
-                                <Radio value="2">中等</Radio>
+                                <Radio value="2">中单</Radio>
                                 <Radio value="3">困难</Radio>
                             </Radio.Group>
                         </div>
@@ -315,9 +512,7 @@ const Main = (props) => {
                                 </Select>
                             </div>
                             <div className="m-left">
-                                <Select style={{ width: 150 }} onChange={paramsstudentChange} placeholder="请选择学生姓名">
-                                    {studentchildren}
-                                </Select>
+                                <Input onChange={paramsstudentChange} placeholder="请选择学生姓名"></Input>
                             </div>
                             <Button style={{ marginLeft: 10 }} onClick={search}>
                                 查询
@@ -327,37 +522,25 @@ const Main = (props) => {
 
                     </div>
                     <div className="m-card" style={height > 638 ? { maxHeight: 600, overflowY: 'scroll', display: 'flex', flexFlow: 'column ' } : { maxHeight: 400, overflowY: 'scroll', display: 'flex', flexFlow: 'column ' }}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(res =>
-                            <div key={res} >
+                        {dataList.map(res =>
+                            <div key={res.id} >
                                 <div className="listT"  >
                                     <div className="know-name-m m-flex" >
-                                        <Zmage style={{ width: 200, height: 200 }} alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
-                                        {res}
+                                        <Zmage style={{ width: 200, height: 200 }} alt="example" src={res.image} />
+                                        {res.text}
                                     </div>
                                     <Divider dashed />
                                     <div className="shop-btn">
                                         <div className="know-title-div">
                                             <p className="know-title">
-                                                学科:
-                                                <span>123</span>
-                                            </p>
-                                            <p className="know-title">
-                                                年级:
-                                                <span>123</span>
-                                            </p>
-                                            <p className="know-title">
-                                                班级:
-                                                <span>132</span>
-                                            </p>
-                                            <p className="know-title">
-                                                姓名:
-                                                <span>123</span>
+                                                错题学生姓名:
+                                                <span>{res.student_str}</span>
                                             </p>
                                         </div>
                                         <div>
-                                            <Button className="z-index" onClick={showModal} type="danger">删除错题</Button>
+                                            <Button className="z-index" onClick={() => deleteI(res.id)} type="danger">删除错题</Button>
                                             <span className="m-left">
-                                                <Button className="z-index" onClick={showModal} type="primary">错题点评</Button>
+                                                <Button className="z-index" onClick={() => detail(res.id, res.image, res.text)} type="primary">错题点评</Button>
                                             </span>
                                         </div>
                                     </div>
@@ -365,7 +548,7 @@ const Main = (props) => {
                             </div>
                         )}
                     </div>
-                    <Pagination className="m-Pleft" current={paramResult.page} onChange={changePage} />
+                    <Pagination className="m-Pleft" current={paramResult.page} onChange={changePage} total={totalCount} />
                 </TabPane>
                 <TabPane tab="已完成" key="3">
                     <Finished></Finished>
@@ -448,7 +631,7 @@ const ModalCompent = (props) => {
     }
     //modal选择下拉框选择学生时的操作
     const modalstudentChange = e => {
-        modalParamResult.xiaoguanjia_student_id = e
+        modalParamResult.xiaoguanjia_student_ids = e
         setModalParam({ ...modalParamResult })
     }
     const modalOk = () => {
@@ -508,7 +691,7 @@ const ModalCompent = (props) => {
                 </div>
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>学生选择：</span>
-                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} value={modalParamResult.xiaoguanjia_student_id} placeholder="请选择学生姓名(可多选)">
+                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} value={modalParamResult.xiaoguanjia_student_ids} placeholder="请选择学生姓名(可多选)">
                         {studentchildren}
                     </Select>
                 </div>
