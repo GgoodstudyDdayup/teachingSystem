@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Input, Button, Select, Pagination, Divider } from 'antd';
 import Zmage from 'react-zmage'
-import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list} from '../../../axios/http'
+import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list } from '../../../axios/http'
 const { Option } = Select
 const Main = (props) => {
     //搜索
@@ -69,10 +69,6 @@ const Main = (props) => {
             }
         })
     }
-
-
-
-
     const getList = (page) => {
         wrong_get_list({
             xiaoguanjia_subject_id: '',
@@ -145,9 +141,14 @@ const Main = (props) => {
                 {dataList.map(res =>
                     <div key={res.id} >
                         <div className="listT"  >
-                            <div className="know-name-m m-flex" >
-                                <Zmage style={{ width: 200, height: 200 }} alt="example" src={res.image} />
-                                {res.text}
+                            <div className="know-name-m m-flex" style={{ flexFlow: 'column' }}>
+                                <div className="m-flex">
+                                    <Zmage style={{ width: 200, height: 200 }} alt="example" src={res.image} />
+                                    {res.text}
+                                </div>
+                                <div style={{fontWeight:'bold'}} dangerouslySetInnerHTML={{ __html: res.analysis_content }}>
+
+                                </div>
                             </div>
                             <Divider dashed />
                             <div className="shop-btn">

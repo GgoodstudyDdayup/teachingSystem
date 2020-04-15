@@ -27,6 +27,7 @@ import Test from '../commont/tset/test'
 import Zj from './zhangjie'
 import ErrorSet from './wrongQuestions/errorSet/index'
 import ExerciseBook from './wrongQuestions/exerciseBook/index'
+import ExerciseBookInfo from './wrongQuestions/exerciseBook/info'
 import ReportForm from './wrongQuestions/reportForm/index'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -425,8 +426,9 @@ class main extends Component {
                             <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
                             {/* 错题管理 */}
                             <Route path="/main/wrongQuestion/errorSet" component={ErrorSet} />
-                            <Route path="/main/wrongQuestion/exerciseBook" component={ExerciseBook} />
-
+                            <Route path="/main/wrongQuestion/exerciseBook" exact component={ExerciseBook} />
+                            <Route path="/main/wrongQuestion/exerciseBook/info" component={ExerciseBookInfo} />
+                            
 
 
                             <Route path="/main/zy" component={ZY} />

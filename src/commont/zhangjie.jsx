@@ -239,7 +239,8 @@ class bk extends Component {
                         <Select style={{ width: '100%' }} showSearch optionFilterProp="children" onChange={this.selsectzhangjieChildren} value={this.state.zhangjieChildrenValue} placeholder="点击选择子章节">
                             {this.state.zhangjieChildren}
                         </Select>
-                    </div><div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                    </div>
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>已选知识点：</span>
                         <span>{this.state.knowTitle}</span>
                     </div>

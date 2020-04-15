@@ -305,3 +305,19 @@ export const get_knowledge = (params) => {
 export const analysis_question = (params) => {
     return instance.post('/api/wrong/analysis_question', params)
 }
+//创建练习册
+export const create_book = (params) => {
+    return instance.post('/api/book/create_book', params)
+}
+//练习册列表
+export const book_get_list = (params) => {
+    return instance.post('/api/book/get_list', params)
+}
+//根据练习册id获取对应的章节
+export const get_chapter_list = (params) => {
+    return instance.post('/api/book/get_chapter_list', params)
+}
+//获取练习册题目
+export const get_chapter_question = (params) => {
+    return instance.post('/api/book/get_chapter_question', params)
+}
