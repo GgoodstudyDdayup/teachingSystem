@@ -378,7 +378,7 @@ const Main = (props) => {
     return (
         <div>
             <Drawer
-                title="错题点评"
+                title="练习册试题"
                 placement="right"
                 width={720}
                 closable={false}

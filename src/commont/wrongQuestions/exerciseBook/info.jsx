@@ -1,14 +1,15 @@
-import React, { Component, useState, useEffect } from 'react';
-import { Tree } from 'antd'
+import React, { Component } from 'react';
+import { Tree, Drawer } from 'antd'
 import { get_chapter_list, get_chapter_question } from '../../../axios/http'
 import { DownOutlined } from '@ant-design/icons';
 import List from './chapterList'
+import Editor from './editor'
 const { TreeNode } = Tree;
 class ExerciseBookInfo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            visible: false,//新增练习册modal
+            visible: false,//drawer
             treeList: [],
             treeParams: {
                 exercise_book_id: localStorage.getItem('infoId'),
@@ -16,7 +17,8 @@ class ExerciseBookInfo extends Component {
                 ques_content: ''
             },
             chapter_questionList: [],
-            chapter_title: ''
+            chapter_title: '',
+            btnChange:false//修改和添加的判断
         }
     }
     componentDidMount() {
@@ -33,16 +35,37 @@ class ExerciseBookInfo extends Component {
         const treeParams = { ...this.state.treeParams }
         treeParams.book_chapter_id = e
         get_chapter_question(treeParams).then(res => {
-            console.log(res)
             this.setState({
                 chapter_questionList: res.data.list,
                 chapter_title: title
             })
         })
     }
+    drawerModal = (...e) => {
+        this.setState({
+            visible: true,
+            btnChange:e[4]
+        })
+    }
+    drawerCancel = () => {
+        this.setState({
+            visible: false
+        })
+    }
     render() {
         return (
             <div>
+                <Drawer
+                    title={this.state.btnChange?'添加练习册试题':'修改练习册试题'}
+                    placement="right"
+                    width={720}
+                    closable={false}
+                    onClose={this.drawerCancel}
+                    visible={this.state.visible}
+                    bodyStyle={{ paddingBottom: 80 }}
+                >
+                    <Editor btnChange={this.state.btnChange}></Editor>
+                </Drawer>
                 <div className="m-flex" style={{ flexWrap: 'nowrap', marginTop: 20 }}>
                     <div className="tree" style={this.state.height > 638 ? { maxHeight: 600, overflowY: 'scroll', width: 370 } : { maxHeight: 400, overflowY: 'scroll', width: 370 }}>
                         <ZjTree treeList={this.state.treeList} chapter_question={this.chapter_question}></ZjTree>
@@ -54,7 +77,7 @@ class ExerciseBookInfo extends Component {
                         {/* <div className="paper-hd-title " style={{ width: '100%', textAlign: 'start', background: '#fff', flex: 1, display: 'flex', justifyContent: 'center' }} >
                             <p>***********</p>
                         </div> */}
-                        <List data={this.state.chapter_questionList}></List>
+                        <List data={this.state.chapter_questionList} drawerModal={this.drawerModal}></List>
                     </div>
                 </div>
             </div>

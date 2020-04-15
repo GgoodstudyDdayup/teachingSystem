@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider } from 'antd';
+import { Divider, Button } from 'antd';
 // import MathJax from 'simple-react-mathjax'
 import MathJax from 'react-mathjax3'
 const ListT = (props) => {
@@ -30,7 +30,7 @@ const ListT = (props) => {
             }}>
             <div className="listT"  >
                 <div className="know-name-m" >
-                    <MathJax.Html html={res.ques_content + res.ques_options} />
+                    <MathJax.Html html={res.ques_options ? res.ques_options : res.ques_content + res.ques_options} />
                     <div>
                         <p className="line-shu">答案</p>
                         <MathJax.Html html={res.ques_answer} />
@@ -41,6 +41,10 @@ const ListT = (props) => {
                         <MathJax.Html html={res.ques_analysis} />
                     </div>
                 </div>
+                <Divider />
+                <div className="m-bottom m-Pleft">
+                    <Button className="z-index" type='primary' onClick={() => props.drawerModal(res.ques_content,res.ques_options,res.ques_answer,res.ques_analysis,false)}>修改题目</Button>
+                </div>
             </div>
         </MathJax.Context>
     )
@@ -50,5 +54,4 @@ const ListT = (props) => {
         </div>
     )
 }
-
 export default ListT
