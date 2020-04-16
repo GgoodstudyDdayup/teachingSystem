@@ -113,6 +113,7 @@ const Main = (props) => {
             permission: '',
             page_size: 100,
         }).then(res => {
+            console.log(res)
             const teachChildren = res.data.list.map(res => {
                 return <Option key={res.id} value={res.id} >{res.name}</Option>
             })

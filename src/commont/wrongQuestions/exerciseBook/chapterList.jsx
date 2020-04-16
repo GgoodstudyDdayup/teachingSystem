@@ -43,7 +43,7 @@ const ListT = (props) => {
                 </div>
                 <Divider />
                 <div className="m-bottom m-Pleft">
-                    <Button className="z-index" type='primary' onClick={() => props.drawerModal(res.ques_content,res.ques_options,res.ques_answer,res.ques_analysis,false)}>修改题目</Button>
+                    <Button className="z-index" type='primary' onClick={() => props.drawerModal(res,false)}>修改题目</Button>
                 </div>
             </div>
         </MathJax.Context>

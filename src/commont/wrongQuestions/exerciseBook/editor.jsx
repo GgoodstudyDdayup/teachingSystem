@@ -4,25 +4,15 @@ import TianK from '../../tiankong/index'
 import JieD from '../../jieda/index'
 import Choose from '../../choose/index'
 import PanD from '../../panduan/index'
-import { tkList, tree, add_question, edit_question_question } from '../../../axios/http'
-import { Select, Radio, Modal, Button, message } from 'antd'
+import { edit_question, create_question } from '../../../axios/http'
+import { Radio, Modal, Button, message } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-const { Option } = Select
 const { confirm } = Modal;
 //通过不用改的题型渲染不同的模板
-
 export default class EditorDemo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            tixingOptions: [],
-            difficultyOptions: [],
-            grandOptions: [],
-            sourceOptions: [],
-            yearOptions: [],
-            tree: [],
-            disabled: true,
-            visible: false,
             value: '',
             selectValue: [],
             panduanState: '',
@@ -36,23 +26,14 @@ export default class EditorDemo extends React.Component {
             ques_knowledge_idList: [],
             sbjArray: [],
             newMsgHandle: [],
-            btnChange: props.btnChange,
             params: {
-                course_type_id: 1,
-                ques_type_id: [],//问题类型id
-                ques_knowledge_ids: '',//知识点id
-                ques_source: '',//试卷来源 
-                ques_grade_id: [],//年级id
-                ques_subject_id: [],//科目id
-                ques_difficulty: '',//难易程度id
+                exercise_book_id: localStorage.getItem('infoId'),
+                book_chapter_id: props.editorBook_id,
                 ques_answer: '',//答案
                 ques_content: '',//内容
                 ques_analysis: '',//解析
-                ques_school: '',
                 ques_options: '',
                 template_id: '',
-                ques_source_type_id: [],
-                ques_year: []
             },
             saveParams: JSON.parse(localStorage.getItem('saveParams')) || {
                 selectValue: [],//科目
@@ -68,7 +49,15 @@ export default class EditorDemo extends React.Component {
         }
     }
     componentDidMount() {
-
+        console.log(this.props.editorDParams.template_id)
+        if (this.props.editorDParams.template_id !== '') {
+            this.setState({
+                params: this.props.editorDParams
+            })
+            console.log(111)
+            this.tableChange(this.props.editorDParams.ques_options)
+            this.switchState(this.props.editorDParams.template_id, this.props.editorDParams)
+        }
     }
     onCheck = (checkedKeys, info) => {
         new Promise((resolve, reject) => {
@@ -121,207 +110,6 @@ export default class EditorDemo extends React.Component {
             return
         }
     }
-    selectonChange = e => {
-        const params = {
-            course_type_id: 1,
-            ques_type_id: [],//问题类型id
-            ques_knowledge_ids: '',//知识点id
-            ques_source: '',//试卷来源 
-            ques_grade_id: [],//年级id
-            ques_subject_id: [],//科目id
-            ques_difficulty: '',//难易程度id
-            ques_answer: '',//答案
-            ques_content: '',//内容
-            ques_analysis: '',//解析
-            ques_options: '',
-            ques_school: '',
-            template_id: '',
-            ques_source_type_id: [],
-            ques_year: []
-        }
-        const saveParams = { ...this.state.saveParams }
-        saveParams.ques_subject_id = e[1]
-        saveParams.selectValue = e
-        tkList({ subject_id: e[1] }).then(res => {
-            const tixingOptions = res.data.ques_type_rela_list.map((res, index) => {
-                return <Option key={index} value={res.ques_type_id} >{res.name}</Option>
-            })
-            const grandOptions = res.data.grade_rela_list.map((res, index) => {
-                return <Option key={index} value={res.grade_id} >{res.name}</Option>
-            })
-            const difficultyOptions = res.data.difficulty_rela_list.map((res, index) => {
-                return <Radio key={index} value={res.difficulty_id}>{res.name}</Radio>
-            })
-            const sourceOptions = res.data.source_rela_list.map((res, index) => {
-                return <Option key={index} value={res.source_id} >{res.name}</Option>
-            })
-            const yearOptions = res.data.year_rela_list.map((res, index) => {
-                return <Option key={index} value={res.year}>{res.name}</Option>
-            })
-            const string = this.state.subject_list.reduce((item, res) => {
-                if (e[1] === res.subject_id) {
-                    item = res.name
-                }
-                return item
-            }, '')
-            params.ques_subject_id = e[1]
-            if (JSON.parse(localStorage.getItem('saveParams')).selectValue.length > 1) {
-                params.ques_type_id = JSON.parse(localStorage.getItem('saveParams')).ques_type_id
-                params.ques_grade_id = JSON.parse(localStorage.getItem('saveParams')).ques_grade_id
-                params.ques_year = JSON.parse(localStorage.getItem('saveParams')).ques_year
-                // params.ques_source = JSON.parse(localStorage.getItem('saveParams')).ques_source
-                params.ques_source_type_id = JSON.parse(localStorage.getItem('saveParams')).ques_source_type_id
-                const typeName = res.data.ques_type_rela_list.reduce((item, res) => {
-                    if (params.ques_type_id === res.ques_type_id) {
-                        item = res.name
-                    }
-                    return item
-                }, '')
-                const gradeName = res.data.grade_rela_list.reduce((item, res) => {
-                    if (params.ques_grade_id === res.grade_id) {
-                        item = res.name
-                    }
-                    return item
-                }, '')
-                const yearName = res.data.year_rela_list.reduce((item, res) => {
-                    if (params.ques_year === res.year) {
-                        item = res.name
-                    }
-                    return item
-                }, '')
-                const sourceName = res.data.source_rela_list.reduce((item, res) => {
-                    if (params.ques_source_type_id === res.source_id) {
-                        item = res.name
-                    }
-                    return item
-                }, '')
-                this.setState({
-                    sourceName,
-                    yearName,
-                    gradeName,
-                    typeName
-                })
-            }
-            tree({ subject_id: params.ques_subject_id }).then(tree => {
-                this.setState({
-                    tixingOptions,
-                    grandOptions,
-                    difficultyOptions,
-                    sourceOptions,
-                    yearOptions,
-                    params,
-                    sbjArray: e,
-                    selectValue: e,
-                    tree: tree.data.list,
-                    disabled: false,
-                    subjectName: string,
-                    year_rela_list: res.data.year_rela_list,
-                    grade_rela_list: res.data.grade_rela_list,
-                    ques_type_rela_list: res.data.ques_type_rela_list,
-                    source_rela_list: res.data.source_rela_list,
-                    saveParams
-                })
-            })
-        })
-    }
-    handleChange = e => {
-        const params = { ...this.state.params }
-        const saveParams = { ...this.state.saveParams }
-        const ques_type_rela_list = this.state.ques_type_rela_list
-        params.ques_type_id = e
-        saveParams.ques_type_id = e
-        const string = ques_type_rela_list.reduce((item, res) => {
-            if (e === res.ques_type_id) {
-                item = res.name
-            }
-            return item
-        }, '')
-        this.setState({
-            params,
-            typeName: string,
-            saveParams
-        })
-    }
-    grandhandleChange = e => {
-        console.log(e)
-        const params = { ...this.state.params }
-        const saveParams = { ...this.state.saveParams }
-        const grade_rela_list = this.state.grade_rela_list
-        params.ques_grade_id = e
-        saveParams.ques_grade_id = e
-        const string = grade_rela_list.reduce((item, res) => {
-            if (e === res.grade_id) {
-                item = res.name
-            }
-            return item
-        }, '')
-        this.setState({
-            params,
-            gradeName: string,
-            saveParams
-        })
-    }
-    yearhandleChange = e => {
-        const params = { ...this.state.params }
-        const saveParams = { ...this.state.saveParams }
-        const year_rela_list = this.state.year_rela_list
-        params.ques_year = e
-        saveParams.ques_year = e
-        const string = year_rela_list.reduce((item, res) => {
-            if (e === res.year) {
-                item = res.name
-            }
-            return item
-        }, '')
-        this.setState({
-            params,
-            yearName: string,
-            saveParams
-        })
-    }
-    sourcehandleChange = e => {
-        const params = { ...this.state.params }
-        const source_rela_list = this.state.source_rela_list
-        const saveParams = { ...this.state.saveParams }
-        saveParams.ques_source_type_id = e
-        params.ques_source_type_id = e
-        const string = source_rela_list.reduce((item, res) => {
-            if (e === res.source_id) {
-                item = res.name
-            }
-            return item
-        }, '')
-        this.setState({
-            params,
-            sourceName: string,
-            saveParams
-        })
-    }
-    changeaitifen_id = (e) => {
-        const params = this.state.params
-        params.ques_knowledge_id = e[0]
-        this.setState({
-            params
-        })
-    }
-    onchangedifficultyRadio = e => {
-        const params = this.state.params
-        params.ques_difficulty = e.target.value
-        this.setState({
-            params
-        })
-    }
-    changeQues_source = (e, content) => {
-        console.log(content)
-        const params = this.state.params
-        const saveParams = { ...this.state.saveParams }
-        params.ques_source = e.target.value
-        saveParams.ques_source = e.target.value
-        this.setState({
-            params,
-            saveParams
-        })
-    }
     tableChange = e => {
         let whatSay = e
         if (whatSay) {
@@ -331,7 +119,6 @@ export default class EditorDemo extends React.Component {
             })
         }
     }
-
     onchangetemplate = e => {
         const params = { ...this.state.params }
         params.ques_answer = ''
@@ -450,50 +237,66 @@ export default class EditorDemo extends React.Component {
         console.log(params)
         const that = this
         if (this.state.btnChange) {
-            if (typeof params.ques_type_id === 'object' || params.ques_knowledge_ids === '' || typeof params.ques_grade_id === 'object' || params.ques_subject_id === '' || params.ques_difficulty === '' || params.ques_answer === '' || params.ques_content === '' || typeof params.ques_year === 'object') {
-                message.warning('请填写必填项')
-            } else {
-                confirm({
-                    title: '是否要提交试题？',
-                    icon: <ExclamationCircleOutlined />,
-                    content: '提交之后的试题请在我的题库中查看',
-                    okText: '确认',
-                    cancelText: '取消',
-                    onOk() {
-                        add_question(params).then(res => {
-                            if (res.code === 0) {
-                                message.success({
-                                    content: res.message,
-                                    onClose: () => {
-                                        that.props.history.push({ pathname: "/main/tk/mine", state: { subject_id: that.state.params.ques_subject_id, sbjArray: that.state.sbjArray } })
-                                    }
-                                })
-                            } else {
-                                message.error(res.message)
+            confirm({
+                title: '是否要提交试题？',
+                icon: <ExclamationCircleOutlined />,
+                okText: '确认',
+                cancelText: '取消',
+                onOk() {
+                    create_question(params).then(res => {
+                        if (res.code === 0) {
+                            message.success({
+                                content: res.message,
+                            })
+                            const params = {
+                                exercise_book_id: localStorage.getItem('infoId'),
+                                book_chapter_id: that.props.editorBook_id,
+                                ques_answer: '',//答案
+                                ques_content: '',//内容
+                                ques_analysis: '',//解析
+                                ques_options: '',
+                                template_id: '',
                             }
-                        })
-                    },
-                    onCancel() {
-                        console.log('Cancel');
-                    },
-                });
-            }
+                            that.setState({
+                                params
+                            })
+                            that.props.drawerCancel()
+                            that.props.get_question()
+                        } else {
+                            message.error(res.message)
+                        }
+                    })
+                },
+                onCancel() {
+                    console.log('Cancel');
+                },
+            });
         } else {
             confirm({
                 title: '是否要修改试题？',
                 icon: <ExclamationCircleOutlined />,
-                content: '修改之后的试题请在我的题库中查看',
                 okText: '确认',
                 cancelText: '取消',
                 onOk() {
-                    edit_question_question(params).then(res => {
+                    edit_question(params).then(res => {
                         if (res.code === 0) {
                             message.success({
                                 content: res.message,
-                                onClose: () => {
-                                    that.props.history.push({ pathname: "/main/tk/mine", state: { subject_id: that.state.params.ques_subject_id, sbjArray: that.state.sbjArray } })
-                                }
                             })
+                            const params = {
+                                exercise_book_id: localStorage.getItem('infoId'),
+                                book_chapter_id: that.props.editorBook_id,
+                                ques_answer: '',//答案
+                                ques_content: '',//内容
+                                ques_analysis: '',//解析
+                                ques_options: '',
+                                template_id: '',
+                            }
+                            that.setState({
+                                params
+                            })
+                            that.props.drawerCancel()
+                            that.props.get_question()
                         } else {
                             message.error(res.message)
                         }
@@ -504,7 +307,6 @@ export default class EditorDemo extends React.Component {
                 },
             });
         }
-
     }
     checkSingle = (res, type) => {
         const params = { ...this.state.params }
@@ -616,18 +418,18 @@ export default class EditorDemo extends React.Component {
                     <div className="m-flex m-bottom" style={{ alignItems: 'center' }}>
                         <span style={{ padding: '8px 0', fontSize: 14, fontWeight: 'bold' }} className="m-row">选择模板</span>
                         <div className="m-left">
-                            <Radio.Group onChange={this.onchangetemplate} value={this.state.params.template_id} disabled={this.state.disabledTemplat}>
-                                <Radio value={1}>填空题模板</Radio>
-                                <Radio value={2}>解答题模板</Radio>
-                                <Radio value={3}>选择题模板</Radio>
-                                <Radio value={4}>判断题模板</Radio>
+                            <Radio.Group onChange={this.onchangetemplate} value={this.state.params.template_id} >
+                                <Radio value='1'>填空题模板</Radio>
+                                <Radio value='2'>解答题模板</Radio>
+                                <Radio value='3'>选择题模板</Radio>
+                                <Radio value='4'>判断题模板</Radio>
                             </Radio.Group>
                         </div>
                     </div>
                     {this.switchState(this.state.params.template_id, this.state.params)}
                 </div>
                 <div style={{ position: 'absolute', right: 0, bottom: "-60px" }}>
-                    {this.state.btnChange ? <Button type="primary" onClick={this.tijiaoshiti}>提交试题</Button> : <Button type="primary" onClick={this.tijiaoshiti}>修改试题</Button>}
+                    {this.props.btnChange ? <Button type="primary" onClick={this.tijiaoshiti}>提交试题</Button> : <Button type="primary" onClick={this.tijiaoshiti}>修改试题</Button>}
                 </div>
             </div>
 

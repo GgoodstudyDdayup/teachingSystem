@@ -321,3 +321,19 @@ export const get_chapter_list = (params) => {
 export const get_chapter_question = (params) => {
     return instance.post('/api/book/get_chapter_question', params)
 }
+//创建练习册章节
+export const create_chapter = (params) => {
+    return instance.post('/api/book/create_chapter', params)
+}
+//章节编辑
+export const edit_chapter = (params) => {
+    return instance.post('/api/book/edit_chapter', params)
+}
+//提交练习册试题
+export const create_question = (params) => {
+    return instance.post('/api/book/create_question', params)
+}
+//练习册题目编辑
+export const edit_question = (params) => {
+    return instance.post('/api/book/edit_question', params)
+}
