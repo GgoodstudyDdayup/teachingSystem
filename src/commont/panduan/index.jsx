@@ -7,6 +7,7 @@ import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
 export default class EditorDemo extends React.Component {
     constructor(props) {
+        console.log(props)
         super(props)
         this.state = {
             // 创建一个空的editorState作为初始值

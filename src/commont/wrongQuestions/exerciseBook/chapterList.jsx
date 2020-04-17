@@ -30,7 +30,7 @@ const ListT = (props) => {
             }}>
             <div className="listT"  >
                 <div className="know-name-m" >
-                    <MathJax.Html html={res.ques_options ? res.ques_options : res.ques_content + res.ques_options} />
+                    <MathJax.Html html={res.ques_options ? res.ques_content + res.ques_options : res.ques_content} />
                     <div>
                         <p className="line-shu">答案</p>
                         <MathJax.Html html={res.ques_answer} />
@@ -43,7 +43,8 @@ const ListT = (props) => {
                 </div>
                 <Divider />
                 <div className="m-bottom m-Pleft">
-                    <Button className="z-index" type='primary' onClick={() => props.drawerModal(res,false)}>修改题目</Button>
+                    <Button className="z-index" type='danger' onClick={() => props.deleteModal(res.id)}>删除题目</Button>
+                    <Button className="z-index m-left" type='primary' onClick={() => props.drawerModal(res, false)}>修改题目</Button>
                 </div>
             </div>
         </MathJax.Context>

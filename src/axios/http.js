@@ -337,3 +337,19 @@ export const create_question = (params) => {
 export const edit_question = (params) => {
     return instance.post('/api/book/edit_question', params)
 }
+//删除练习册试题
+export const del_question_children = (params) => {
+    return instance.post('/api/book/del_question', params)
+}
+//删除章节
+export const del_chapter = (params) => {
+    return instance.post('/api/book/del_chapter', params)
+}
+//编辑练习册
+export const edit_book = (params) => {
+    return instance.post('/api/book/edit_book', params)
+}
+//删除练习册
+export const del_book = (params) => {
+    return instance.post('/api/book/del_book', params)
+}
