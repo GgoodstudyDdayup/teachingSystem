@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { login, get_company_list } from '../axios/http'
+import { student_login} from '../../axios/http'
 import { message } from 'antd'
 //定义组件内部私有的状态
 class Login extends Component {
@@ -42,50 +42,16 @@ class Login extends Component {
     }
     login = () => {
         const params = this.state.filter
-        login(params).then(res => {
+        student_login(params).then(res => {
             console.log(res)
             if (res.data.code === 0) {
                 message.success({
                     content: `${res.data.message}`,
                     onClose: () => {
                         localStorage.setItem("token", res.data.data.user_info.token)
-                        localStorage.setItem("username", params.username)
-                        localStorage.setItem("teacher_type", res.data.data.user_info.teacher_type)
-                        localStorage.setItem("permission", res.data.data.user_info.permission)
-                        localStorage.setItem("id", res.data.data.user_info.id)
-                        const save = {
-                            selectValue: [],//科目
-                            ques_type_id: [],//问题类型id
-                            ques_source: '',//试卷来源 
-                            ques_grade_id: [],//年级id
-                            ques_subject_id: [],//科目id
-                            ques_year: [],
-                        }
-                        localStorage.setItem('saveParams', JSON.stringify(save))
-                        if (res.data.data.company_list !== null && res.data.data.company_list.length > 0) {
-                            localStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
-                            localStorage.setItem('company', res.data.data.company_list[0].company)
-                            localStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
-                            this.props.history.push("/main")
-                        } else {
-                            get_company_list().then(l1 => {
-                                if (l1.code === 0) {
-                                    const company_list = l1.data.company_list.reduce((item, rsq) => {
-                                        if (res.data.data.user_info.company_id === rsq.id) {
-                                            item.push(rsq)
-                                        }
-                                        return item
-                                    }, [])
-                                    localStorage.setItem("company_list", JSON.stringify(company_list))
-                                    localStorage.setItem('company', company_list[0].company)
-                                    localStorage.setItem('company_id', company_list[0].id)
-                                    this.props.history.push("/main")
-                                } else {
-                                    message.warning('系统繁忙请重试')
-                                }
-
-                            })
-                        }
+                        localStorage.setItem("username", res.data.data.user_info.username)
+                        localStorage.setItem("student_id", res.data.data.user_info.student_id)
+                        this.props.history.push('/studentMain')                        
                     },
                     duration: 1
                 })
@@ -115,7 +81,7 @@ class Login extends Component {
             <div className="login-page" style={{ height: `${this.state.height}px` }}>
                 <div className="login-index">
                     <div className="login-index-left">
-                        <img src={require('../img/3997c1ecc3ff10a23a307e4f23903ce.png')} alt="" />
+                        <img src={require('../../img/3997c1ecc3ff10a23a307e4f23903ce.png')} alt="" />
                     </div>
                     <div className="login-index-right">
                         <p>欢迎登录教学管理平台</p>

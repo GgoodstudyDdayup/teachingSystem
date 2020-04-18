@@ -3,14 +3,49 @@ import TianK from '../../tiankong/index'
 import JieD from '../../jieda/index'
 import Choose from '../../choose/index'
 import PanD from '../../panduan/index'
+import MathJax from 'react-mathjax3'
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Tree, Drawer, Button, Modal, Input, Select, message, Radio } from 'antd'
-import { get_chapter_list, get_chapter_question, create_chapter, edit_chapter, del_question_children, del_chapter, edit_question } from '../../../axios/http'
+import { get_chapter_list, get_chapter_question, create_chapter, edit_chapter, del_question_children, del_chapter, edit_question, set_chapter_ques_sort } from '../../../axios/http'
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import List from './chapterList'
 import Creat from './creat'
 const { TreeNode } = Tree;
 const { Option } = Select
 const { confirm } = Modal
+// 重新记录数组顺序
+const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+};
+const grid = 8;
+// 设置样式
+const getItemStyle = (isDragging, draggableStyle) => {
+    const style = {
+        userSelect: "none",
+        padding: grid * 2,
+        margin: `0 0 ${grid}px 0`,
+
+        // 拖拽的时候背景变化
+        background: isDragging ? "lightgreen" : "#fff",
+        border: '1px solid #eee',
+        // styles we need to apply on draggables
+        ...draggableStyle,
+        textAlign: 'start',
+        justifyContent: 'space-between',
+        display: 'flex'
+    }
+    return (
+        style
+    )
+}
+const getListStyle = () => ({
+    background: 'white',
+    padding: grid,
+    width: '100%'
+});
 class ExerciseBookInfo extends Component {
     constructor(props) {
         super(props)
@@ -27,7 +62,7 @@ class ExerciseBookInfo extends Component {
                 ques_content: ''
             },
             params: {
-                book_question_id: localStorage.getItem('infoId'),
+                book_question_id: '',
                 book_chapter_id: '',
                 ques_answer: '',//答案
                 ques_content: '',//内容
@@ -52,8 +87,10 @@ class ExerciseBookInfo extends Component {
             chapter_title: '',
             btnChange: false,//修改和添加的判断
             editorBook_id: '',
-            book_chapter_id: ''
+            book_chapter_id: '',
+            paixuIndex: false
         }
+        this.onDragEnd = this.onDragEnd.bind(this);
     }
     componentDidMount() {
         get_chapter_list({ exercise_book_id: localStorage.getItem('infoId') }).then(res => {
@@ -73,6 +110,36 @@ class ExerciseBookInfo extends Component {
         this.setState = (state, callback) => {
             return
         }
+    }
+    //拖拽过后的钩子设置每个类里面题目的排序
+    onDragEnd(result) {
+        const chapter_id = this.state.treeParams.book_chapter_id
+        const list = this.state.chapter_questionList
+        if (!result.destination) {
+            return;
+        }
+        const items = reorder(
+            list,
+            result.source.index,
+            result.destination.index
+        )
+        // 告诉list你需要改变那个ques_list
+        let ques_ids_sort = ''
+        items.forEach(res => {
+            ques_ids_sort += res.id + ','
+        })
+        set_chapter_ques_sort({ book_chapter_id: chapter_id, ques_ids_sort: ques_ids_sort }).then(res => {
+            if (res.code === 0) {
+                get_chapter_question(this.state.treeParams).then(res => {
+                    this.setState({
+                        chapter_questionList: res.data.list
+                    })
+                })
+            } else {
+                message.warning('系统繁忙请稍后再试~~~')
+            }
+        })
+
     }
     onCheck = (checkedKeys, info) => {
         new Promise((resolve, reject) => {
@@ -440,12 +507,14 @@ class ExerciseBookInfo extends Component {
         })
     }
     drawerModal = (e, type) => {
+        console.log(e)
         const params = { ...this.state.params }
         params.ques_analysis = e.ques_analysis
         params.ques_answer = e.ques_answer
         params.ques_content = e.ques_content
         params.ques_options = e.ques_options
         params.book_chapter_id = e.exercise_book_chapter_id
+        params.book_question_id = e.id
         params.template_id = e.template_id
         this.setState({
             visible: true,
@@ -708,6 +777,11 @@ class ExerciseBookInfo extends Component {
             },
         });
     }
+    sortNauto =(res)=>{
+        this.setState({
+            paixuIndex: res
+        })
+    }
     render() {
         return (
             <div>
@@ -788,6 +862,9 @@ class ExerciseBookInfo extends Component {
                                     <div style={{ position: 'relative', left: 10, top: 7 }}>
                                         <div style={{ display: 'flex' }}>
                                             <Button type='primary' size='small' onClick={this.editorMulu}>编辑</Button>
+                                            <div className="m-left"></div>
+                                            {this.state.paixuIndex?<Button type='primary' size='small' onClick={()=>this.sortNauto(false)}>取消排序</Button>:<Button type='primary' size='small' onClick={()=>this.sortNauto(true)}>手动排序</Button>}
+                                            
                                             {/* <div className='m-left'><Button type='danger' size='small' onClick={this.deltetzZj}>删除</Button></div> */}
                                         </div>
                                         <Modal
@@ -812,7 +889,86 @@ class ExerciseBookInfo extends Component {
                         {/* <div className="paper-hd-title " style={{ width: '100%', textAlign: 'start', background: '#fff', flex: 1, display: 'flex', justifyContent: 'center' }} >
                             <p>***********</p>
                         </div> */}
-                        <List data={this.state.chapter_questionList} drawerModal={this.drawerModal} deleteModal={this.deleteModal}></List>
+                        <div>
+                            <div className="m-zijuan-flex" >
+                                {this.state.paixuIndex ?
+                                    <DragDropContext onDragEnd={this.onDragEnd}>
+                                        <center style={{ width: '100%', textAlign: 'start' }}>
+                                            <Droppable droppableId='list'>
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        //provided.droppableProps应用的相同元素.
+                                                        {...provided.droppableProps}
+                                                        // 为了使 droppable 能够正常工作必须 绑定到最高可能的DOM节点中provided.innerRef.
+                                                        ref={provided.innerRef}
+                                                        style={getListStyle(snapshot)}
+                                                    >
+
+                                                        {this.state.chapter_questionList.map((item, index) => (
+                                                            <Draggable key={item.id} draggableId={item.id} index={index}>
+                                                                {(provided, snapshot) => (
+                                                                    <div
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        style={getItemStyle(
+                                                                            snapshot.isDragging,
+                                                                            provided.draggableProps.style
+                                                                        )}
+                                                                    >
+                                                                        <div className="know-name-m">
+                                                                            <span className="know-ques">
+                                                                                <MathJax.Context
+                                                                                    key={index}
+                                                                                    input='tex'
+                                                                                    onError={(MathJax, error) => {
+                                                                                        console.warn(error);
+                                                                                        MathJax.Hub.Queue(
+                                                                                            MathJax.Hub.Typeset()
+                                                                                        );
+                                                                                    }}
+                                                                                    script="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js"
+                                                                                    options={{
+                                                                                        messageStyle: 'none',
+                                                                                        extensions: ['tex2jax.js'],
+                                                                                        jax: ['input/TeX', 'output/HTML-CSS'],
+                                                                                        tex2jax: {
+                                                                                            inlineMath: [['$', '$'], ['\\(', '\\)']],
+                                                                                            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                                                                                            processEscapes: true,
+                                                                                        },
+                                                                                        TeX: {
+                                                                                            extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
+                                                                                        }
+                                                                                    }}>
+                                                                                    <MathJax.Html html={item.ques_content} />
+                                                                                </MathJax.Context>
+                                                                            </span>
+                                                                        </div>
+                                                                        {/* <div className="zujuan-m">
+                                                                        <span style={{ width: 100, display: 'inline-block' }}>分值：</span>
+                                                                        <Input className="zujuan-m-item-input" defaultValue="0571" onChange={(e, index) => changeValue(e, index)} />
+                                                                    </div> */}
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </center>
+                                    </DragDropContext> :
+                                    <div style={{ width: '100%', background: '#fff', padding: 8 }}>
+                                        {/* <div className="leixing-title" onMouseEnter={() => this.mouseEnter(res.ques_type_id)} onMouseLeave={() => this.mouseOut()}>
+                                                {res.show_type_name}
+                                                <div className={this.state.appearPaixu === res.ques_type_id ? 'm-shoudongpaixu' : 'm-none'} onClick={() => this.paixuIndex(res.ques_type_id)}>手动排序</div>
+                                            </div> */}
+                                        <List data={this.state.chapter_questionList} drawerModal={this.drawerModal} deleteModal={this.deleteModal}></List>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div >

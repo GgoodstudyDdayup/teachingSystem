@@ -21,6 +21,7 @@ class ExerciseBook extends Component {
                 page: 1
             },//这是搜索条件
             params2: {
+                exercise_book_id:'',
                 name: '',
                 xiaoguanjia_grade_id: [],
                 xiaoguanjia_subject_id: [],
@@ -142,6 +143,7 @@ class ExerciseBook extends Component {
     editExbook = (e, res) => {
         e.stopPropagation()
         const params2 = { ...this.state.params2 }
+        params2.exercise_book_id = res.id
         params2.name = res.name
         params2.xiaoguanjia_grade_id = res.xiaoguanjia_grade_id
         params2.xiaoguanjia_subject_id = res.xiaoguanjia_subject_id
@@ -347,7 +349,7 @@ class ExerciseBook extends Component {
                 </Modal>
                 <div style={{ marginTop: 20, display: 'flex', flexWrap: 'wrap', maxHeight: 600, overflowY: 'scroll' }} >
                     {this.state.exBookList.map(res =>
-                        <div className="m-bottom" style={{ marginLeft: 30 }} key={res} onClick={() => this.info(res.id)}>
+                        <div className="m-bottom" style={{ marginLeft: 30 }} key={res.id} onClick={() => this.info(res.id)}>
                             <Card
                                 hoverable
                                 style={{ width: 240 }}
@@ -447,6 +449,7 @@ const AddBook = (props) => {
                 onCancel={props.cancelAddModal}
                 okText="确认"
                 cancelText="取消"
+                key="creat"
             >
                 <Upload
                     {...prop}

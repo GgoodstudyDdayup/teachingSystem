@@ -4,6 +4,8 @@ import Zujuan from '../commont/zujuan/zujuan'
 import Preview from '../commont/preview/index'
 import SetPreview from '../commont/preview/index2'
 import resourceCenter from '../commont/resourceCenter/recommended/index'
+import StudentMain from '../commont/sutdent/main'
+import StudentLogin from '../commont/sutdent/login'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import React, { Component } from 'react';
 class router extends Component {
@@ -18,6 +20,8 @@ class router extends Component {
                         <Route path="/main/zujuan" component={Zujuan} />
                         <Route path="/preview" component={Preview} />
                         <Route path="/setPreview" component={SetPreview} />
+                        <Route path="/studentLogin" component={StudentLogin} />
+                        <Route path="/studentMain" component={StudentMain} />
                     </Switch>
                 </div>
             </Router>

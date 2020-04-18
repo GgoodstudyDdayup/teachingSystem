@@ -1,4 +1,4 @@
-import { instance, loginPost,downLoad } from './axios'
+import { instance, loginPost,downLoad ,studentInstance} from './axios'
 //login为了获取token
 export const login = (params) => {
     return loginPost.post('/api/user/login', params)
@@ -353,3 +353,16 @@ export const edit_book = (params) => {
 export const del_book = (params) => {
     return instance.post('/api/book/del_book', params)
 }
+//练习册章节里面题目排序
+export const set_chapter_ques_sort = (params) => {
+    return instance.post('/api/book/set_chapter_ques_sort', params)
+}
+//学生登录
+export const student_login = (params) => {
+    return loginPost.post('/api/student/login', params)
+}
+//学生退出
+export const student_logout = (params) => {
+    return loginPost.post('/api/student/logout', params)
+}
+

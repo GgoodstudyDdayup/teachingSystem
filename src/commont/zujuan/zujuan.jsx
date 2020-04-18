@@ -198,7 +198,6 @@ export default class ReactBeautifulDnd extends Component {
             })
         })
     }
-
     changeSetIndex(e) {
         this.setState({
             setIndex: e
@@ -306,7 +305,6 @@ export default class ReactBeautifulDnd extends Component {
             tixinSet: Number(e)
         })
     }
-
     changeInputDefault = (e) => {
         this.setState({
             editInput: e.target.value
@@ -635,7 +633,6 @@ export default class ReactBeautifulDnd extends Component {
                                 <Button className="m-left" type='primary' onClick={this.preview}>预览试卷</Button>
                                 <Button className="m-left" type="primary" onClick={this.next}>下一步</Button>
                             </div>
-
                             <div className={this.state.setIndex === 3 ? "paper-hd-title paper-hd-title-active " : 'paper-hd-title active'} style={{ background: '#fff', flex: 1 }} onClick={() => this.changeSetIndex(3)}>
                                 <h3>{this.state.biaotiTitle}</h3>
                             </div>
@@ -649,7 +646,8 @@ export default class ReactBeautifulDnd extends Component {
                             {this.state.tixinSet === 1 ? <SetMain suerEditInput={this.suerEditInput} editInput={this.state.editInput} tixinSet={this.tixinSet} data={this.state.list} setItem={this.setItem} sureInputDefault={this.sureInputDefault} deleteTlei={this.deleteTlei} changeInputDefault={this.changeInputDefault}></SetMain> : <div>
                                 {this.state.list.map((res, index) =>
                                     <div className="m-zijuan-flex" key={index}>
-                                        {this.state.paixuIndex === res.ques_type_id ? <DragDropContext onDragEnd={this.onDragEnd}>
+                                        {this.state.paixuIndex === res.ques_type_id ? 
+                                        <DragDropContext onDragEnd={this.onDragEnd}>
                                             <center style={{ width: '100%', textAlign: 'start' }}>
                                                 <Droppable droppableId={res.id}>
                                                     {(provided, snapshot) => (
@@ -669,7 +667,6 @@ export default class ReactBeautifulDnd extends Component {
                                                                     {(provided, snapshot) => (
                                                                         <div
                                                                             ref={provided.innerRef}
-
                                                                             {...provided.draggableProps}
                                                                             {...provided.dragHandleProps}
                                                                             style={getItemStyle(
@@ -677,7 +674,6 @@ export default class ReactBeautifulDnd extends Component {
                                                                                 provided.draggableProps.style
                                                                             )}
                                                                         >
-
                                                                             <div className="know-name-m">
                                                                                 <span className="know-ques">
                                                                                     <MathJax.Context
