@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Input, Button, Select, Pagination, Divider } from 'antd';
-import Zmage from 'react-zmage'
 import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list } from '../../../axios/http'
 const { Option } = Select
 const Main = (props) => {
@@ -31,6 +30,7 @@ const Main = (props) => {
     }, [height])
     //获取默认的学科和年级数据
     useEffect(() => {
+        console.log(11)
         wrong_get_list({
             xiaoguanjia_subject_id: '',
             xiaoguanjia_grade_id: '',
@@ -58,7 +58,7 @@ const Main = (props) => {
             })
             setGradechildren([...gradechildren])
         })
-    }, [])
+    },[props.count])
     const search = () => {
         wrong_get_list(paramResult).then(res => {
             if (res.code === 0) {
@@ -143,8 +143,7 @@ const Main = (props) => {
                         <div className="listT"  >
                             <div className="know-name-m m-flex" style={{ flexFlow: 'column' }}>
                                 <div className="m-flex">
-                                    <Zmage style={{ width: 200, height: 200 }} alt="example" src={res.image} />
-                                    {res.text}
+                                    <div dangerouslySetInnerHTML={{__html:res.text}}></div>
                                 </div>
                                 <div style={{fontWeight:'bold'}} dangerouslySetInnerHTML={{ __html: res.analysis_content }}>
 

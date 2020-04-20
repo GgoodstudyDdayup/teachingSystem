@@ -45,6 +45,7 @@ const ListT = (props) => {
                 <div className="m-bottom m-Pleft">
                     <Button className="z-index" type='danger' onClick={() => props.deleteModal(res.id)}>删除题目</Button>
                     <Button className="z-index m-left" type='primary' onClick={() => props.drawerModal(res, false)}>修改题目</Button>
+                    <Button className="z-index m-left" type='primary' onClick={() => props.luru(res)}>错题录入</Button>
                 </div>
             </div>
         </MathJax.Context>

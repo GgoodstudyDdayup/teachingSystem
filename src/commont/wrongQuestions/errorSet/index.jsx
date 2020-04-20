@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Tabs, Drawer, Input, Button, Radio, Col, Row, Select, Upload, Icon, Pagination, Modal, message, Divider } from 'antd';
-import Zmage from 'react-zmage'
 import { ContentUtils } from 'braft-utils'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import Finished from './finished'
+import AddEditor from './addEditor'
+import CanvasImage from './canvasImage'
 import { analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student, loginUserList, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
 const { TabPane } = Tabs
 const { Option } = Select
-const { TextArea } = Input
 const { confirm } = Modal
 const Main = (props) => {
     //搜索
@@ -32,7 +31,8 @@ const Main = (props) => {
         xiaoguanjia_student_ids: [],
         analysis_teacher_id: [],
         image: '',
-        text: ''
+        text: '',
+        upload_channel_id: 1,
     }
     //点评
     const drawerParams = {
@@ -66,12 +66,13 @@ const Main = (props) => {
     const [tixingOptions, setTixingOptions] = useState([])
     const [sourceOptions, setSourceOptions] = useState([])
     const [wrong_reasonOptions, setWrong_reasonOptions] = useState([])
-    const [drawerImage, setDrawerImage] = useState('')
+    // const [drawerImage, setDrawerImage] = useState('')
     const [drawerText, setDrawerText] = useState('')
     const [pubildzjList, setPubilcZjList] = useState([])
     const [zjList, setZjList] = useState([])
     const [zjChildrenList, setZjChildrenList] = useState([])
     const [knowlageList, setKnowlageList] = useState([])
+    const [countNumber, setCount] = useState(0)
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
 
     useEffect(() => {
@@ -210,7 +211,7 @@ const Main = (props) => {
     const detail = (id, image, text) => {
         drawerParamResult['id'] = id
         setDrawerParam({ ...drawerParamResult })
-        setDrawerImage(image)
+        // setDrawerImage(image)
         setDrawerText(text)
         get_analysis_option({ id }).then(res => {
             if (res.code === 0) {
@@ -376,6 +377,9 @@ const Main = (props) => {
         drawerParamResult.knowledge_ids = e
         setDrawerParam({ ...drawerParamResult })
     }
+    const tabchangeCount = e => {
+        setCount(e)
+    }
     return (
         <div>
             <Drawer
@@ -388,8 +392,8 @@ const Main = (props) => {
                 bodyStyle={{ paddingBottom: 80 }}
             >
                 <div className=" m-bottom m-flex">
-                    <Zmage style={{ width: 200, height: 200 }} alt="example" src={drawerImage} />
-                    <span>{drawerText}</span>
+                    {/* <Zmage style={{ width: 200, height: 200 }} alt="example" src={drawerImage} /> */}
+                    <span dangerouslySetInnerHTML={{ __html: drawerText }}></span>
                 </div>
                 <Row gutter={16}>
                     <Col span={12}>
@@ -472,7 +476,7 @@ const Main = (props) => {
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>难易程度</span>
                             <Radio.Group defaultValue="a" onChange={(e) => radioChange(e, 'mastery_level')} value={drawerParamResult.mastery_level}>
                                 <Radio value="1">简单</Radio>
-                                <Radio value="2">中单</Radio>
+                                <Radio value="2">中等</Radio>
                                 <Radio value="3">困难</Radio>
                             </Radio.Group>
                         </div>
@@ -493,11 +497,13 @@ const Main = (props) => {
                 </div>
             </Drawer>
             <ModalCompent modalParams={modalParamResult} modalCancel={modalCancel} modalOk={modalOk} visible2={visible2} teacherchildren={teacherchildren} subjectchildren={subjectchildren} gradechildren={gradechildren} />
-            <Tabs defaultActiveKey='1' >
+            <Tabs defaultActiveKey='1' onChange={tabchangeCount}>
                 <TabPane tab="未完成" key="1">
+                   
                     <div className="m-bottom m-flex" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
                         <div className="m-flex">
                             <div >
+                            <CanvasImage></CanvasImage>
                                 <Select style={{ width: 120 }} placeholder="请选择学科" onChange={(e) => paramsSelect(e, 'xiaoguanjia_subject_id')} value={paramResult.xiaoguanjia_subject_id}>
                                     {subjectchildren}
                                 </Select>
@@ -527,8 +533,7 @@ const Main = (props) => {
                             <div key={res.id} >
                                 <div className="listT"  >
                                     <div className="know-name-m m-flex" >
-                                        <Zmage style={{ width: 200, height: 200 }} alt="example" src={res.image} />
-                                        {res.text}
+                                        <div dangerouslySetInnerHTML={{ __html: res.text }}></div>
                                     </div>
                                     <Divider dashed />
                                     <div className="shop-btn">
@@ -552,7 +557,7 @@ const Main = (props) => {
                     <Pagination className="m-Pleft" current={paramResult.page} onChange={changePage} total={totalCount} />
                 </TabPane>
                 <TabPane tab="已完成" key="3">
-                    <Finished></Finished>
+                    <Finished count={countNumber}></Finished>
                 </TabPane>
             </Tabs>
         </div >
@@ -561,51 +566,19 @@ const Main = (props) => {
 const ModalCompent = (props) => {
     //录入
     const modalParams = props.modalParams
-    const [loading, setLoading] = useState(false)
     const [modalParamResult, setModalParam] = useState(modalParams)
     const [classchildren, setClasschildren] = useState([])
     const [studentchildren, setStudentchildren] = useState([])
-    const uploadButton = (
-        <div>
-            {loading ? <LoadingOutlined /> : <PlusOutlined />}
-            <div className="ant-upload-text">上传</div>
-        </div>
-    );
+    const [data, setdata] = useState({})
+
     useEffect(() => {
         setModalParam({ ...props.modalParams })
     }, [props.modalParams])
-    const cuoti = (e) => {
-        if (e.file.status !== "uploading") {
-            setLoading(false)
-            modalParamResult.image = e.file.response.data.full_path
-            setModalParam({ ...modalParamResult })
-        } else {
-            setLoading(true)
-            return false
-        }
-    }
-    const text = e => {
-        modalParamResult.text = e.target.value
-        setModalParam({ ...modalParamResult })
-    }
     const teachChange = e => {
         modalParamResult.analysis_teacher_id = e
         setModalParam({ ...modalParamResult })
     }
-    const prop = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
-        onChange: cuoti,
-        multiple: true,
-        name: 'upload_control',
-        headers: {
-            token: localStorage.getItem("token"),
-            username: localStorage.getItem("username"),
-            companyid: localStorage.getItem("companyid"),
-        },
-        data: {
-            type: 2
-        }
-    }
+
     //modal选择下拉框科目年级时的操作
     const modalChange = (e, res) => {
         modalParamResult[res] = e
@@ -641,6 +614,10 @@ const ModalCompent = (props) => {
     const modalCancel = () => {
         props.modalCancel()
     }
+    const getContent = (html) => {
+        modalParamResult.text = html
+        setModalParam({ ...modalParamResult })
+    }
     return (
         <div>
             <Modal
@@ -651,21 +628,6 @@ const ModalCompent = (props) => {
                 okText='确认'
                 cancelText='取消'
             >
-                <div style={{ display: 'flex' }}>
-                    <div>
-                        <Upload
-                            {...prop}
-                            listType="picture-card"
-                            className="avatar-uploader"
-                            showUploadList={false}
-                        >
-                            {modalParamResult.image ? <img src={modalParamResult.image} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-                        </Upload>
-                    </div>
-                    <div className='m-left' style={{ width: '100%' }}>
-                        <TextArea style={{ height: 105 }} onChange={text} placeholder='录题如需要填写文字再输入' value={modalParamResult.text}></TextArea>
-                    </div>
-                </div>
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>老师选择：</span>
                     <Select style={{ width: '100%' }} optionFilterProp="children" showSearch onChange={teachChange} value={modalParamResult.analysis_teacher_id} placeholder="请选择老师">
@@ -696,6 +658,7 @@ const ModalCompent = (props) => {
                         {studentchildren}
                     </Select>
                 </div>
+                <AddEditor data={data} getContent={getContent}></AddEditor>
             </Modal>
         </div>
     )

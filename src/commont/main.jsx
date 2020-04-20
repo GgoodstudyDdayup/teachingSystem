@@ -229,7 +229,7 @@ class main extends Component {
                         </SubMenu>
                         <Menu.Item key="227">
                             <ContainerOutlined />
-                            <span>小亚练习册
+                            <span>电子练习册
                             </span>
                             <Link to='/main/wrongQuestion/exerciseBook'></Link>
                         </Menu.Item>

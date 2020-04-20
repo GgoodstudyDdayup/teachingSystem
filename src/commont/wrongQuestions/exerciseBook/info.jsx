@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import TianK from '../../tiankong/index'
 import JieD from '../../jieda/index'
 import Choose from '../../choose/index'
@@ -6,7 +6,7 @@ import PanD from '../../panduan/index'
 import MathJax from 'react-mathjax3'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Tree, Drawer, Button, Modal, Input, Select, message, Radio } from 'antd'
-import { get_chapter_list, get_chapter_question, create_chapter, edit_chapter, del_question_children, del_chapter, edit_question, set_chapter_ques_sort } from '../../../axios/http'
+import { submit_wrong_question, loginUserList, get_xiaoguanjia_student, get_xiaoguanjia_class, get_chapter_list, get_chapter_question, create_chapter, edit_chapter, del_question_children, del_chapter, edit_question, set_chapter_ques_sort, get_xiaoguanjia_subject, get_xiaoguanjia_grade } from '../../../axios/http'
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import List from './chapterList'
 import Creat from './creat'
@@ -55,7 +55,19 @@ class ExerciseBookInfo extends Component {
             visible3: false,//章节
             visible4: false,//目录修改
             visible5: false,//章节修改
+            visible6: false,
             treeList: [],
+            modalParamResult: {
+                xiaoguanjia_subject_id: [],
+                xiaoguanjia_grade_id: [],
+                xiaoguanjia_class_id: [],
+                xiaoguanjia_student_ids: [],
+                analysis_teacher_id: [],
+                book_question_id: '',
+                image: '',
+                text: '',
+                upload_channel_id: 2,
+            },
             treeParams: {
                 exercise_book_id: localStorage.getItem('infoId'),
                 book_chapter_id: '',
@@ -88,7 +100,10 @@ class ExerciseBookInfo extends Component {
             btnChange: false,//修改和添加的判断
             editorBook_id: '',
             book_chapter_id: '',
-            paixuIndex: false
+            paixuIndex: false,
+            subjectchildren: [],
+            gradechildren: [],
+            teachChildren: []
         }
         this.onDragEnd = this.onDragEnd.bind(this);
     }
@@ -96,6 +111,38 @@ class ExerciseBookInfo extends Component {
         get_chapter_list({ exercise_book_id: localStorage.getItem('infoId') }).then(res => {
             this.setState({
                 treeList: res.data.list
+            })
+        })
+        get_xiaoguanjia_subject().then(res => {
+            const subjectchildren = res.data.list.map(res => {
+                const value = res.value.split('-')[1]
+                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
+            })
+            this.setState({
+                subjectchildren
+            })
+        })
+        get_xiaoguanjia_grade().then(res => {
+            const gradechildren = res.data.list.map(res => {
+                const value = res.value.split('-')[1]
+                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
+            })
+            this.setState({
+                gradechildren
+            })
+        })
+        loginUserList({
+            name: '',
+            username: '',
+            permission: '',
+            page_size: 100,
+        }).then(res => {
+            console.log(res)
+            const teachChildren = res.data.list.map(res => {
+                return <Option key={res.id} value={res.id} >{res.name}</Option>
+            })
+            this.setState({
+                teachChildren
             })
         })
         this.setState({
@@ -636,9 +683,12 @@ class ExerciseBookInfo extends Component {
         edit_chapter(editorCparams).then(res => {
             if (res.code === 0) {
                 message.success(res.message)
-                this.setState({
-                    visible4: false,
-                    chapter_title: editorCparams.chapter
+                get_chapter_list({ exercise_book_id: localStorage.getItem('infoId') }).then(res => {
+                    this.setState({
+                        treeList: res.data.list,
+                        visible4: false,
+                        chapter_title: editorCparams.chapter
+                    })
                 })
             } else {
                 message.error(res.message)
@@ -777,9 +827,38 @@ class ExerciseBookInfo extends Component {
             },
         });
     }
-    sortNauto =(res)=>{
+    sortNauto = (res) => {
         this.setState({
             paixuIndex: res
+        })
+    }
+    //练习册题目录入
+    modalCancel = e => {
+        this.setState({
+            visible6: false
+        })
+    };
+    modalOk = params => {
+        const studentString = params.xiaoguanjia_student_ids.reduce((item, res) => {
+            item += res + ','
+            return item
+        }, '')
+        params.xiaoguanjia_student_ids = studentString
+        submit_wrong_question(params).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                this.modalCancel()
+            } else {
+                message.error(res.message)
+            }
+        })
+    };
+    luru = (res) => {
+        const modalParamResult = { ...this.state.modalParamResult }
+        modalParamResult.book_question_id = res.id
+        this.setState({
+            visible6: true,
+            modalParamResult
         })
     }
     render() {
@@ -863,8 +942,8 @@ class ExerciseBookInfo extends Component {
                                         <div style={{ display: 'flex' }}>
                                             <Button type='primary' size='small' onClick={this.editorMulu}>编辑</Button>
                                             <div className="m-left"></div>
-                                            {this.state.paixuIndex?<Button type='primary' size='small' onClick={()=>this.sortNauto(false)}>取消排序</Button>:<Button type='primary' size='small' onClick={()=>this.sortNauto(true)}>手动排序</Button>}
-                                            
+                                            {this.state.paixuIndex ? <Button type='primary' size='small' onClick={() => this.sortNauto(false)}>取消排序</Button> : <Button type='primary' size='small' onClick={() => this.sortNauto(true)}>手动排序</Button>}
+
                                             {/* <div className='m-left'><Button type='danger' size='small' onClick={this.deltetzZj}>删除</Button></div> */}
                                         </div>
                                         <Modal
@@ -964,11 +1043,12 @@ class ExerciseBookInfo extends Component {
                                                 {res.show_type_name}
                                                 <div className={this.state.appearPaixu === res.ques_type_id ? 'm-shoudongpaixu' : 'm-none'} onClick={() => this.paixuIndex(res.ques_type_id)}>手动排序</div>
                                             </div> */}
-                                        <List data={this.state.chapter_questionList} drawerModal={this.drawerModal} deleteModal={this.deleteModal}></List>
+                                        <List data={this.state.chapter_questionList} drawerModal={this.drawerModal} deleteModal={this.deleteModal} luru={this.luru}></List>
                                     </div>
                                 }
                             </div>
                         </div>
+                        <ModalCompent modalParams={this.state.modalParamResult} modalCancel={this.modalCancel} modalOk={this.modalOk} visible2={this.state.visible6} teacherchildren={this.state.teachChildren} subjectchildren={this.state.subjectchildren} gradechildren={this.state.gradechildren}></ModalCompent>
                     </div>
                 </div>
             </div >
@@ -1082,6 +1162,100 @@ const Zjmulu = (props) => {
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>名称：</span>
                     <Input style={{ width: '100%' }} placeholder="请填写练习册名称" onChange={zhangjiechange} value={paramResult.chapter}></Input>
+                </div>
+            </Modal>
+        </div>
+    )
+}
+const ModalCompent = (props) => {
+    //录入
+    const modalParams = props.modalParams
+    const [modalParamResult, setModalParam] = useState(modalParams)
+    const [classchildren, setClasschildren] = useState([])
+    const [studentchildren, setStudentchildren] = useState([])
+    useEffect(() => {
+        setModalParam({ ...props.modalParams })
+    }, [props.modalParams])
+    const teachChange = e => {
+        modalParamResult.analysis_teacher_id = e
+        setModalParam({ ...modalParamResult })
+    }
+    //modal选择下拉框科目年级时的操作
+    const modalChange = (e, res) => {
+        modalParamResult[res] = e
+        if (typeof modalParamResult.xiaoguanjia_subject_id !== 'object' && typeof modalParamResult.xiaoguanjia_grade_id !== 'object') {
+            get_xiaoguanjia_class(modalParamResult).then(res => {
+                const classchildren = res.data.list.map(l1 => {
+                    return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
+                })
+                setClasschildren([...classchildren])
+            })
+        }
+        setModalParam({ ...modalParamResult })
+    }
+    //modal选择下拉框班级时的操作
+    const modalclassChange = e => {
+        get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
+            const studentchildren = res.data.list.map(l1 => {
+                return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+            })
+            modalParamResult.xiaoguanjia_class_id = e
+            setModalParam({ ...modalParamResult })
+            setStudentchildren(studentchildren)
+        })
+    }
+    //modal选择下拉框选择学生时的操作
+    const modalstudentChange = e => {
+        modalParamResult.xiaoguanjia_student_ids = e
+        setModalParam({ ...modalParamResult })
+    }
+    const modalOk = () => {
+        props.modalOk(modalParamResult)
+    }
+    const modalCancel = () => {
+        props.modalCancel()
+    }
+    
+    return (
+        <div>
+            <Modal
+                title="错题录入"
+                visible={props.visible2}
+                onOk={modalOk}
+                onCancel={modalCancel}
+                okText='确认'
+                cancelText='取消'
+            >
+                
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>老师选择：</span>
+                    <Select style={{ width: '100%' }} optionFilterProp="children" showSearch onChange={teachChange} value={modalParamResult.analysis_teacher_id} placeholder="请选择老师">
+                        {props.teacherchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>学科选择：</span>
+                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_subject_id')} value={modalParamResult.xiaoguanjia_subject_id} placeholder="请选择学科">
+                        {props.subjectchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>年级选择：</span>
+                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_grade_id')} value={modalParamResult.xiaoguanjia_grade_id} placeholder="请选择年级">
+                        {props.gradechildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>班级选择：</span>
+                    <Select style={{ width: '100%' }} onChange={modalclassChange} value={modalParamResult.xiaoguanjia_class_id} placeholder="请选择班级">
+                        {classchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>学生选择：</span>
+                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} value={modalParamResult.xiaoguanjia_student_ids} placeholder="请选择学生姓名(可多选)">
+                        {studentchildren}
+                    </Select>
                 </div>
             </Modal>
         </div>

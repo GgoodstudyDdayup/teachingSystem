@@ -32,7 +32,8 @@ const Main = (props) => {
         xiaoguanjia_student_ids: [],
         analysis_teacher_id: [],
         image: '',
-        text: ''
+        text: '',
+        upload_channel_id:1
     }
     //点评
     const drawerParams = {
@@ -78,7 +79,6 @@ const Main = (props) => {
     }, [height])
     //获取默认的学科和年级数据
     useEffect(() => {
-
         wrong_get_list({
             xiaoguanjia_subject_id: '',
             xiaoguanjia_grade_id: '',
@@ -471,7 +471,7 @@ const Main = (props) => {
                             <span style={{ fontSize: 17, color: 'rgba(0,0,0,.85)' }}>难易程度</span>
                             <Radio.Group defaultValue="a" onChange={(e) => radioChange(e, 'mastery_level')} value={drawerParamResult.mastery_level}>
                                 <Radio value="1">简单</Radio>
-                                <Radio value="2">中单</Radio>
+                                <Radio value="2">中等</Radio>
                                 <Radio value="3">困难</Radio>
                             </Radio.Group>
                         </div>
