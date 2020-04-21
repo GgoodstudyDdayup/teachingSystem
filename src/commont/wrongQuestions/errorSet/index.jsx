@@ -4,7 +4,6 @@ import { ContentUtils } from 'braft-utils'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
 import Finished from './finished'
-import AddEditor from './addEditor'
 import CanvasImage from './canvasImage'
 import { analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student, loginUserList, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
 const { TabPane } = Tabs
@@ -380,10 +379,29 @@ const Main = (props) => {
     const tabchangeCount = e => {
         setCount(e)
     }
+    const bianji = (id, res) => {
+        console.log(id, res)
+        modalParamResult.xiaoguanjia_subject_id = res.xiaoguanjia_subject_id
+        modalParamResult.xiaoguanjia_grade_id = res.xiaoguanjia_grade_id
+        modalParamResult.xiaoguanjia_class_id = res.xiaoguanjia_class_id
+        modalParamResult.xiaoguanjia_student_ids = res.xiaoguanjia_student_ids.split(',')
+        modalParamResult.analysis_teacher_id = res.analysis_teacher_id
+        modalParamResult.text = res.text
+        setVisible2(true)
+        setModalParam({ ...modalParamResult })
+    }
+    const eidtorOk = params => {
+        console.log(params)
+        const studentString = params.xiaoguanjia_student_ids.reduce((item, res) => {
+            item += res + ','
+            return item
+        }, '')
+        params.xiaoguanjia_student_ids = studentString
+    }
     return (
         <div>
             <Drawer
-                title="练习册试题"
+                title="错题点评"
                 placement="right"
                 width={720}
                 closable={false}
@@ -497,13 +515,13 @@ const Main = (props) => {
                 </div>
             </Drawer>
             <ModalCompent modalParams={modalParamResult} modalCancel={modalCancel} modalOk={modalOk} visible2={visible2} teacherchildren={teacherchildren} subjectchildren={subjectchildren} gradechildren={gradechildren} />
+            <EditorModalCompent modalParams={modalParamResult} modalCancel={modalCancel} modalOk={eidtorOk} visible2={visible2} teacherchildren={teacherchildren} subjectchildren={subjectchildren} gradechildren={gradechildren}></EditorModalCompent>
             <Tabs defaultActiveKey='1' onChange={tabchangeCount}>
                 <TabPane tab="未完成" key="1">
-                   
+
                     <div className="m-bottom m-flex" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
                         <div className="m-flex">
                             <div >
-                            <CanvasImage></CanvasImage>
                                 <Select style={{ width: 120 }} placeholder="请选择学科" onChange={(e) => paramsSelect(e, 'xiaoguanjia_subject_id')} value={paramResult.xiaoguanjia_subject_id}>
                                     {subjectchildren}
                                 </Select>
@@ -546,6 +564,9 @@ const Main = (props) => {
                                         <div>
                                             <Button className="z-index" onClick={() => deleteI(res.id)} type="danger">删除错题</Button>
                                             <span className="m-left">
+                                                <Button className="z-index" onClick={() => bianji(res.id, res)} type="primary">编辑错题</Button>
+                                            </span>
+                                            <span className="m-left">
                                                 <Button className="z-index" onClick={() => detail(res.id, res.image, res.text)} type="primary">错题点评</Button>
                                             </span>
                                         </div>
@@ -566,11 +587,57 @@ const Main = (props) => {
 const ModalCompent = (props) => {
     //录入
     const modalParams = props.modalParams
+    modalParams.text = BraftEditor.createEditorState(props.modalParams.text || null)
     const [modalParamResult, setModalParam] = useState(modalParams)
     const [classchildren, setClasschildren] = useState([])
     const [studentchildren, setStudentchildren] = useState([])
-    const [data, setdata] = useState({})
+    const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+    const addimg = e => {
+        if (e.file.status !== "uploading") {
+            modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+                type: 'IMAGE',
+                url: e.file.response.data.full_path
+            }])
+            setModalParam({ ...modalParamResult })
+        } else {
+            return false
+        }
+    }
+    const props2 = {
+        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        onChange: addimg,
+        multiple: true,
+        name: 'upload_control',
+        headers: {
+            token: localStorage.getItem("token"),
+            username: localStorage.getItem("username"),
+            companyid: localStorage.getItem("companyid"),
 
+        },
+        data: {
+            type: 2
+        }
+    }
+    const extendControls = [
+        {
+            key: 'antd-uploader',
+            type: 'component',
+            component: (
+                <Upload
+                    {...props2}
+                    accept="image/*"
+                    showUploadList={false}
+                // customRequest={this.uploadHandler}
+                // beforeUpload={this.beforeUpload}
+                >
+                    {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                    <button type="button" className="control-item button upload-button" data-title="插入图片">
+                        <Icon type="picture" theme="filled" />
+                    </button>
+                </Upload>
+            )
+        }
+    ]
     useEffect(() => {
         setModalParam({ ...props.modalParams })
     }, [props.modalParams])
@@ -618,6 +685,11 @@ const ModalCompent = (props) => {
         modalParamResult.text = html
         setModalParam({ ...modalParamResult })
     }
+    const handleChange = (editorState) => {
+        getContent(editorState.toHTML())
+        modalParamResult.text = editorState
+        setModalParam({ ...modalParamResult })
+    }
     return (
         <div>
             <Modal
@@ -658,7 +730,189 @@ const ModalCompent = (props) => {
                         {studentchildren}
                     </Select>
                 </div>
-                <AddEditor data={data} getContent={getContent}></AddEditor>
+                <div className="editor-wrapper my-component my-editor-component">
+                    <BraftEditor
+                        value={modalParamResult.text}
+                        onChange={handleChange}
+                        controls={controls}
+                        contentStyle={{ height: 300 }}
+                        extendControls={extendControls}
+                    />
+                </div>
+            </Modal>
+        </div>
+    )
+}
+const EditorModalCompent = (props) => {
+    //录入
+    const modalParams = props.modalParams
+    modalParams.text = BraftEditor.createEditorState(props.modalParams.text || null)
+    const [modalParamResult, setModalParam] = useState(modalParams)
+    const [classchildren, setClasschildren] = useState([])
+    const [studentchildren, setStudentchildren] = useState([])
+    const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+    const addimg = e => {
+        if (e.file.status !== "uploading") {
+            modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+                type: 'IMAGE',
+                url: e.file.response.data.full_path
+            }])
+            setModalParam({ ...modalParamResult })
+        } else {
+            return false
+        }
+    }
+    const props2 = {
+        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        onChange: addimg,
+        multiple: true,
+        name: 'upload_control',
+        headers: {
+            token: localStorage.getItem("token"),
+            username: localStorage.getItem("username"),
+            companyid: localStorage.getItem("companyid"),
+
+        },
+        data: {
+            type: 2
+        }
+    }
+    const extendControls = [
+        {
+            key: 'antd-uploader',
+            type: 'component',
+            component: (
+                <Upload
+                    {...props2}
+                    accept="image/*"
+                    showUploadList={false}
+                // customRequest={this.uploadHandler}
+                // beforeUpload={this.beforeUpload}
+                >
+                    {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                    <button type="button" className="control-item button upload-button" data-title="插入图片">
+                        <Icon type="picture" theme="filled" />
+                    </button>
+                </Upload>
+            )
+        }
+    ]
+    useEffect(() => {
+        setModalParam({ ...props.modalParams })
+    }, [props.modalParams])
+    // useEffect(() => {
+    //     get_xiaoguanjia_class(modalParamResult).then(res => {
+    //         const classchildren = res.data.list.map(l1 => {
+    //             return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
+    //         })
+    //         setClasschildren([...classchildren])
+    //     })
+    //     get_xiaoguanjia_student({ xiaoguanjia_class_id:modalParamResult.xiaoguanjia_class_id }).then(res => {
+    //         const studentchildren = res.data.list.map(l1 => {
+    //             return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+    //         })
+    //         setStudentchildren(studentchildren)
+    //     })
+    // }, [modalParamResult.xiaoguanjia_class_id])
+    const teachChange = e => {
+        modalParamResult.analysis_teacher_id = e
+        setModalParam({ ...modalParamResult })
+    }
+
+    //modal选择下拉框科目年级时的操作
+    const modalChange = (e, res) => {
+        modalParamResult[res] = e
+        if (typeof modalParamResult.xiaoguanjia_subject_id !== 'object' && typeof modalParamResult.xiaoguanjia_grade_id !== 'object') {
+            get_xiaoguanjia_class(modalParamResult).then(res => {
+                const classchildren = res.data.list.map(l1 => {
+                    return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
+                })
+                setClasschildren([...classchildren])
+            })
+        }
+        setModalParam({ ...modalParamResult })
+    }
+    //modal选择下拉框班级时的操作
+    const modalclassChange = e => {
+        get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
+            const studentchildren = res.data.list.map(l1 => {
+                return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+            })
+            modalParamResult.xiaoguanjia_class_id = e
+            setModalParam({ ...modalParamResult })
+            setStudentchildren(studentchildren)
+        })
+    }
+    //modal选择下拉框选择学生时的操作
+    const modalstudentChange = e => {
+        modalParamResult.xiaoguanjia_student_ids = e
+        setModalParam({ ...modalParamResult })
+    }
+    const modalOk = () => {
+        props.modalOk(modalParamResult)
+    }
+    const modalCancel = () => {
+        props.modalCancel()
+    }
+    const getContent = (html) => {
+        modalParamResult.text = html
+        setModalParam({ ...modalParamResult })
+    }
+    const handleChange = (editorState) => {
+        getContent(editorState.toHTML())
+        modalParamResult.text = editorState
+        setModalParam({ ...modalParamResult })
+    }
+    return (
+        <div>
+            <Modal
+                title="错题录入"
+                visible={props.visible2}
+                onOk={modalOk}
+                onCancel={modalCancel}
+                okText='确认'
+                cancelText='取消'
+            >
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>老师选择：</span>
+                    <Select style={{ width: '100%' }} optionFilterProp="children" showSearch onChange={teachChange} value={modalParamResult.analysis_teacher_id} placeholder="请选择老师">
+                        {props.teacherchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>学科选择：</span>
+                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_subject_id')} value={modalParamResult.xiaoguanjia_subject_id} placeholder="请选择学科">
+                        {props.subjectchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>年级选择：</span>
+                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_grade_id')} value={modalParamResult.xiaoguanjia_grade_id} placeholder="请选择年级">
+                        {props.gradechildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>班级选择：</span>
+                    <Select style={{ width: '100%' }} onChange={modalclassChange} value={modalParamResult.xiaoguanjia_class_id} placeholder="请选择班级">
+                        {classchildren}
+                    </Select>
+                </div>
+                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                    <span className="m-row" style={{ textAlign: 'right' }}>学生选择：</span>
+                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} value={modalParamResult.xiaoguanjia_student_ids} placeholder="请选择学生姓名(可多选)">
+                        {studentchildren}
+                    </Select>
+                </div>
+                <CanvasImage></CanvasImage>
+                <div className="editor-wrapper my-component my-editor-component">
+                    <BraftEditor
+                        value={modalParamResult.text}
+                        onChange={handleChange}
+                        controls={controls}
+                        contentStyle={{ height: 300 }}
+                        extendControls={extendControls}
+                    />
+                </div>
             </Modal>
         </div>
     )
