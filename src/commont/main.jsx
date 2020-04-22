@@ -29,6 +29,7 @@ import ErrorSet from './wrongQuestions/errorSet/index'
 import ExerciseBook from './wrongQuestions/exerciseBook/index'
 import ExerciseBookInfo from './wrongQuestions/exerciseBook/info'
 import ReportForm from './wrongQuestions/reportForm/index'
+import CreatNewClass from './quanxian/creatnewclass'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -331,6 +332,9 @@ class main extends Component {
                             <Menu.Item key="12">
                                 <Link to="/main/jiaoyanzu">教研组</Link>
                             </Menu.Item>
+                            <Menu.Item key="13">
+                                <Link to="/main/quanxian/CreatNewClass">错题分配</Link>
+                            </Menu.Item>
                         </SubMenu> : ''}
 
 
@@ -422,7 +426,9 @@ class main extends Component {
                             <Route path="/main/bk" exact component={BK} />
                             <Route path="/main/bk/prograss" component={Prograss} />
                             <Route path="/main/bk/kejian" component={Kj} />
-                            <Route path="/main/quanxian" component={Quanxian} />
+                            <Route path="/main/quanxian" exact component={Quanxian} />
+                            <Route path="/main/quanxian/CreatNewClass" component={CreatNewClass} />
+                            
                             <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
                             {/* 错题管理 */}
                             <Route path="/main/wrongQuestion/errorSet" component={ErrorSet} />

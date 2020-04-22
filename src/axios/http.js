@@ -366,3 +366,21 @@ export const student_logout = (params) => {
     return loginPost.post('/api/student/logout', params)
 }
 
+//获取校管家原来作业吧（晚辅导）的列表
+export const xiaoguanjia_zuoyeba_list = (params) => {
+    return instance.post('/api/wrong/xiaoguanjia_zuoyeba_list', params)
+}
+//根据校管家的作业吧我们重新创建自己的新班
+export const create_own_class = (params) => {
+    return instance.post('/api/wrong/create_own_class', params)
+}
+//错题编辑
+export const edit_wrong_question = (params) => {
+    return instance.post('/api/wrong/edit_wrong_question', params)
+}
+//获取我们自定义设置的作业吧（晚辅导）班级列表
+export const get_own_class_list = (params) => {
+    return instance.post('/api/wrong/get_own_class_list', params)
+}
+
+

@@ -801,3 +801,7 @@
   background: #1890ff;
   transform: skew(-200deg);
 }
+.media-wrap img{
+  width: 380px;
+  height: 150px;
+}
