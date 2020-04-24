@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Modal, message, Select, Input } from 'antd'
-import { xiaoguanjia_zuoyeba_list, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_student, create_own_class, get_own_class_list } from '../../axios/http'
+import { Button, Modal, message, Select, Input, Tag } from 'antd'
+import { xiaoguanjia_zuoyeba_list, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_student, create_own_class, get_own_class_list, edit_own_class, del_own_class } from '../../axios/http'
+import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons'
 const { Option } = Select
 class creatnewclass extends Component {
     constructor(props) {
@@ -12,6 +13,8 @@ class creatnewclass extends Component {
             gradechildren: [],
             zuoyebaClasschildren: [],
             studentchildren: [],
+            ownClassList: [],
+            changeTitle: true,
             params: {
                 class_name: '',
                 xiaoguanjia_subject_id: [],
@@ -21,6 +24,7 @@ class creatnewclass extends Component {
                 teacher_employee_id: []
             },
             creatParams: {
+                own_class_id: '',
                 class_name: '',
                 xiaoguanjia_subject_id: [],
                 xiaoguanjia_grade_id: [],
@@ -31,7 +35,7 @@ class creatnewclass extends Component {
         }
     }
     componentDidMount() {
-        const params = {...this.state.params                                              }
+        const params = { ...this.state.params }
         xiaoguanjia_zuoyeba_list().then(res => {
             const zuoyebaClasschildren = res.data.list.map(res => {
                 return <Option key={res.class_id} value={res.class_id} >{res.name}</Option>
@@ -47,7 +51,8 @@ class creatnewclass extends Component {
                 return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
             })
             this.setState({
-                subjectchildren
+                subjectchildren,
+                subjectList: res.data.list
             })
         })
         get_xiaoguanjia_grade().then(res => {
@@ -56,39 +61,74 @@ class creatnewclass extends Component {
                 return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
             })
             this.setState({
-                gradechildren
+                gradechildren,
+                grandList: res.data.list
             })
         })
-        get_own_class_list(params).then(res=>{
-            console.log(res)
+        get_own_class_list(params).then(res => {
+            this.setState({
+                ownClassList: res.data.list
+            })
         })
     }
     showModal = () => {
         this.setState({
-            visible: true
+            visible: true,
+            changeTitle: true,
         })
     }
     onOk = () => {
         const creatParams = { ...this.state.creatParams }
-        create_own_class(creatParams).then(res => {
-            if (res.code === 0) {
-                message.success(res.message)
-                this.setState({
-                    visible: false,
-                    creatParams: {
-                        class_name: '',
-                        xiaoguanjia_subject_id: [],
-                        xiaoguanjia_grade_id: [],
-                        xiaoguanjia_class_id: [],
-                        xiaoguanjia_student_ids: [],
-                        teacher_employee_id: []
-                    }
-                })
-            } else {
-                message.error(res.message)
-            }
-        })
-
+        const params = { ...this.state.params }
+        if (this.state.changeTitle) {
+            create_own_class(creatParams).then(res => {
+                if (res.code === 0) {
+                    message.success(res.message)
+                    get_own_class_list(params).then(res => {
+                        this.setState({
+                            ownClassList: res.data.list
+                        })
+                    })
+                    this.setState({
+                        visible: false,
+                        creatParams: {
+                            class_name: '',
+                            xiaoguanjia_subject_id: [],
+                            xiaoguanjia_grade_id: [],
+                            xiaoguanjia_class_id: [],
+                            xiaoguanjia_student_ids: [],
+                            teacher_employee_id: []
+                        }
+                    })
+                } else {
+                    message.error(res.message)
+                }
+            })
+        } else {
+            edit_own_class(creatParams).then(res => {
+                if (res.code === 0) {
+                    message.success(res.message)
+                    get_own_class_list(params).then(res => {
+                        this.setState({
+                            ownClassList: res.data.list
+                        })
+                    })
+                    this.setState({
+                        visible: false,
+                        creatParams: {
+                            class_name: '',
+                            xiaoguanjia_subject_id: [],
+                            xiaoguanjia_grade_id: [],
+                            xiaoguanjia_class_id: [],
+                            xiaoguanjia_student_ids: [],
+                            teacher_employee_id: []
+                        }
+                    })
+                } else {
+                    message.error(res.message)
+                }
+            })
+        }
     }
     onCancel = () => {
         const creatParams = {
@@ -134,6 +174,96 @@ class creatnewclass extends Component {
             creatParams
         })
     }
+    teachInfo = (id, teachId) => {
+        const teach = this.state.zuoyebaClass.reduce((item, res) => {
+            if (res.class_id === id) {
+                res.employee_list.forEach(l1 => {
+                    if (l1.employee_id === teachId) {
+                        item = l1.name
+                    }
+                })
+            }
+            return item
+        }, '')
+        return teach
+    }
+    zuoyebaInfo = (e) => {
+        const zuoyeba = this.state.zuoyebaClass.reduce((item, res) => {
+            if (res.class_id === e) {
+                item = res.name
+            }
+            return item
+        }, '')
+        return <Tag color="purple">{zuoyeba}</Tag>
+    }
+    grandInfo = (e) => {
+        if (this.state.grandList) {
+            const grand = this.state.grandList.reduce((item, res) => {
+                if (res.xiaoguanjia_id === e) {
+                    item = res.value.split('-')[1]
+                }
+                return item
+            }, '')
+            return <Tag color="volcano">{grand}</Tag>
+        }
+    }
+    subjectInfo = (e) => {
+        if (this.state.subjectList) {
+            const subject = this.state.subjectList.reduce((item, res) => {
+                if (res.xiaoguanjia_id === e) {
+                    item = res.value.split('-')[1]
+                }
+                return item
+            }, '')
+            return <Tag color="green">{subject}</Tag>
+        }
+    }
+    edit = (e) => {
+        const creatParams = { ...this.state.creatParams }
+        creatParams.class_name = e.class_name
+        creatParams.xiaoguanjia_subject_id = e.xiaoguanjia_subject_id
+        creatParams.xiaoguanjia_grade_id = e.xiaoguanjia_grade_id
+        creatParams.xiaoguanjia_class_id = e.xiaoguanjia_class_id
+        creatParams.xiaoguanjia_student_ids = e.xiaoguanjia_student_ids.split(',')
+        creatParams.teacher_employee_id = e.teacher_employee_id
+        creatParams.own_class_id = e.id
+        get_xiaoguanjia_student({ xiaoguanjia_class_id: e.xiaoguanjia_class_id }).then(res => {
+            const studentchildren = res.data.list.map(res => {
+                return <Option key={res.student_id} value={res.student_id} >{res.name}</Option>
+            })
+            const teacherchildren = this.state.zuoyebaClass.reduce((item, res) => {
+                if (e.xiaoguanjia_class_id === res.class_id) {
+                    res.employee_list.forEach(l2 => {
+                        item.push(<Option key={l2.employee_id} value={l2.employee_id} >{l2.name}</Option>)
+                    })
+                }
+                return item
+            }, [])
+            this.setState({
+                studentchildren,
+                teacherchildren,
+                creatParams,
+                visible: true,
+                changeTitle: false
+            })
+        })
+    }
+    del = (e) => {
+        const params = {...this.state.params}
+        del_own_class({ own_class_id: e }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_own_class_list(params).then(res => {
+                    this.setState({
+                        ownClassList: res.data.list
+                    })
+                })
+
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
     render() {
         const prop = {
             visible: this.state.visible,
@@ -147,9 +277,35 @@ class creatnewclass extends Component {
             searchStudents: this.searchStudents,
             creatParams: this.state.creatParams
         }
+        const { ownClassList } = this.state
         return (
             <div>
                 <Button onClick={this.showModal} type='primary'>班级分配</Button>
+                <div className="m-flex " style={{ flexWrap: 'wrap' }}>
+                    {ownClassList.map((res, index) =>
+                        <div className='creatClassCard m-bottom m-flex' style={{ marginTop: 10, flexFlow: 'column', marginLeft: 10 }} key={index}>
+                            <div className="m-flex" style={{ justifyContent: 'space-between' }}>
+                                <p className="card-classname">{res.class_name}</p>
+                                <div>
+                                    <EditTwoTone onClick={() => this.edit(res)} />
+                                    <DeleteTwoTone onClick={() => this.del(res.id)} twoToneColor="#f40" className='m-left' />
+                                </div>
+                            </div>
+                            <div className="m-flex" style={{ marginTop: 10 }}>
+                                <span style={{ display: 'inline-block', width: 50, color: '#9B9BA3' }}>老师：</span>
+                                <span>{this.teachInfo(res.xiaoguanjia_class_id, res.teacher_employee_id)}</span>
+                            </div>
+                            <div className="m-flex" style={{ marginTop: 10 }}>
+                                <span style={{ display: 'inline-block', width: 50, color: '#9B9BA3' }}>学生：</span>
+                                <span>王老师</span>
+                            </div>
+                            <div className="m-flex" style={{ marginTop: 10 }}>
+                                <span style={{ display: 'inline-block', width: 50, color: '#9B9BA3' }}>信息：</span>
+                                <span>{this.zuoyebaInfo(res.xiaoguanjia_class_id)}{this.subjectInfo(res.xiaoguanjia_subject_id)}{this.grandInfo(res.xiaoguanjia_grade_id)}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
                 <Cmodal {...prop}></Cmodal>
             </div>
         );

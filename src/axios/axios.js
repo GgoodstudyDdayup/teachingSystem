@@ -49,8 +49,7 @@ const studentInstance = axios.create({
     },
 })
 studentInstance.interceptors.request.use(function (config) {
-    console.log(config)
-    config.headers['username'] = localStorage.getItem("username")
+    // config.headers['username'] = localStorage.getItem("username")
     config.headers['token'] = localStorage.getItem("token")
     config.headers['studentid'] = localStorage.getItem("student_id")
     NProgress.start()

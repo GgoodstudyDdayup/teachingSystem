@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../../axios/http'
-import { LogoutOutlined, EditTwoTone, RadarChartOutlined } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone } from '@ant-design/icons'
 import ErrorSet from './errorSet/index'
 import Form from './reportForm/index'
 const { Header, Sider, Content } = Layout;
-const { SubMenu } = Menu;
 const { Option } = Select
 class main extends Component {
     constructor(opt) {
@@ -135,24 +134,12 @@ class main extends Component {
                     <div className="logoicon">
                     </div>
                     <Menu onClick={this.handleClick} mode="vertical" theme="dark">
-
-                        <SubMenu
-                            key="sub22"
-                            title={
-                                <span>
-                                    <RadarChartOutlined />
-                                    <span>错题管理</span>
-                                </span>
-                            }
-                        >
-                            <Menu.Item key="226">
-                                <Link to='/studentMain/reportForm'>小亚报表</Link>
-                            </Menu.Item>
-                            <Menu.Item key="225">
-                                <Link to='/studentMain'>小亚错题集</Link>
-                            </Menu.Item>
-                        </SubMenu>
-
+                        <Menu.Item key="226">
+                            <Link to='/studentMain/reportForm'>小亚报表</Link>
+                        </Menu.Item>
+                        <Menu.Item key="225">
+                            <Link to='/studentMain'>小亚错题本</Link>
+                        </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout>
@@ -222,7 +209,7 @@ class main extends Component {
                             {/* 错题管理 */}
                             <Route path="/studentMain" exact component={ErrorSet} />
                             <Route path="/studentMain/reportForm" component={Form} />
-                            
+
                         </Switch>
 
                     </Content>

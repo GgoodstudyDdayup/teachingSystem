@@ -1,4 +1,4 @@
-import { instance, loginPost,downLoad ,studentInstance} from './axios'
+import { instance, loginPost, downLoad, studentInstance } from './axios'
 //login为了获取token
 export const login = (params) => {
     return loginPost.post('/api/user/login', params)
@@ -381,6 +381,35 @@ export const edit_wrong_question = (params) => {
 //获取我们自定义设置的作业吧（晚辅导）班级列表
 export const get_own_class_list = (params) => {
     return instance.post('/api/wrong/get_own_class_list', params)
+}
+//编辑班级
+export const edit_own_class = (params) => {
+    return instance.post('/api/wrong/edit_own_class', params)
+}
+//删除班级
+export const del_own_class = (params) => {
+    return instance.post('/api/wrong/del_own_class', params)
+}
+
+
+
+
+
+
+
+
+
+//获取学生登录后错题列表
+export const get_user_wrong_question = (params) => {
+    return studentInstance.post('/api/student/get_user_wrong_question', params)
+}
+//获取学生PC端的学科
+export const Sget_xiaoguanjia_subject = (params) => {
+    return studentInstance.get('/api/student/get_xiaoguanjia_subject', params)
+}
+//获取学生PC端的年级
+export const Sget_xiaoguanjia_grade = (params) => {
+    return studentInstance.get('/api/student/get_xiaoguanjia_grade', params)
 }
 
 

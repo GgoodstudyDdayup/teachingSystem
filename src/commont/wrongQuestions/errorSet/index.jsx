@@ -225,6 +225,7 @@ const Main = (props) => {
                 const source = res.data.source_list.map((res, index) => {
                     return <Option key={res.name} value={res.id} >{res.name}</Option>
                 })
+                
                 setPubilcZjList(res.data.course_section_list)
                 setTixingOptions([...tixingOptions])
                 setSourceOptions([...source])
