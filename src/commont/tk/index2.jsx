@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message, BackTop } from 'antd';
+import { Tabs, Spin, Badge, Icon, message, BackTop } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
-import Searchbtn from './searchbtn'
 import { tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type, get_paper_info } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
-const { Search } = Input
 
 const { TabPane } = Tabs;
 class tikuguanli2 extends Component {
@@ -380,15 +378,15 @@ class tikuguanli2 extends Component {
             })
         })
     }
-    keyWord = e => {
-        const params = { ...this.state.params }
-        params.key_words = e
-        question(params).then(res => {
-            this.setState({
-                list: res.data.list
-            })
-        })
-    }
+    // keyWord = e => {
+    //     const params = { ...this.state.params }
+    //     params.key_words = e
+    //     question(params).then(res => {
+    //         this.setState({
+    //             list: res.data.list
+    //         })
+    //     })
+    // }
     changePage = page => {
         const params = { ...this.state.params }
         params.page = page
@@ -453,8 +451,8 @@ class tikuguanli2 extends Component {
                             <div >
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600, width: '100%' } : { height: 400, width: '100%' }}>
                                     <div>
-                                        <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
-                                        <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
+                                        {/* <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn> */}
+                                        {/* <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton /> */}
                                         {/* <div className="m-scroll-list"> */}
                                         <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                                         {/* </div> */}

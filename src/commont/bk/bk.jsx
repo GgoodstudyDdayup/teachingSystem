@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Table, Button, DatePicker, Modal, Upload, Input, Checkbox, Pagination, message, Tag } from 'antd';
+import { Table, Button, DatePicker, Modal, Upload, Input, Checkbox, Pagination, message, Tag, Select } from 'antd';
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { paike, zidingyikejian, kechendizhi } from '../../axios/http'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 moment.locale('zh-cn')
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 const CheckboxGroup = Checkbox.Group;
+const { Option } = Select
 const plainOptions = ['知识精讲', '三点剖析', '例题', '随练', '扩展'];
 const dateFormat = 'YYYY-MM-DD'
 class bk extends Component {
@@ -63,7 +64,8 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-
+        parmas['endtime'] = time
+        console.log(parmas)
         paike(parmas).then(res => {
             const list = res.data.list.map((res, index) => {
                 res.key = `${index}`
@@ -79,10 +81,15 @@ class bk extends Component {
     }
     //日期改变
     onchange = (value, dateString) => {
-        console.log(value, dateString)
         const parmas = this.state.parmas
-        parmas['starttime'] = dateString[0]
-        parmas['endtime'] = dateString[1]
+        parmas['starttime'] = dateString
+        this.setState({
+            parmas
+        })
+    }
+    onchangeEnd = (value, dateString) => {
+        const parmas = this.state.parmas
+        parmas['endtime'] = dateString
         this.setState({
             parmas
         })
@@ -296,12 +303,27 @@ class bk extends Component {
         }
         return <Tag color={color}>{text}</Tag>
     }
+    setPageSize = e => {
+        const parmas = this.state.parmas
+        parmas.page_size = e
+        this.setState({
+            parmas
+        })
+    }
+    numberonChange = e => {
+        const parmas = this.state.parmas
+        parmas.page = e.target.value
+        this.setState({
+            parmas
+        })
+    }
     render() {
         const columns = [
             {
                 title: '老师姓名',
                 dataIndex: 'name',
                 key: 'name',
+                sorter: (a, b) => a.name.length - b.name.length,
                 render: (text) => (
                     <span>
                         {text ? text : 'null'}
@@ -312,6 +334,7 @@ class bk extends Component {
                 title: '班级',
                 dataIndex: 'classname',
                 key: 'classname',
+                sorter: (a, b) => a.classname.length - b.classname.length,
             },
 
             {
@@ -328,6 +351,7 @@ class bk extends Component {
                 title: '是否备课',
                 dataIndex: 'is_beike',
                 key: 'is_beike',
+                sorter: (a, b) => a.is_beike - b.is_beike,
                 render: (text) => (
                     <span>
                         {text === '1' ? '已备课' : '未备课'}
@@ -347,6 +371,7 @@ class bk extends Component {
                 title: '是否上课',
                 dataIndex: 'isfinished',
                 key: 'isfinished',
+                sorter: (a, b) => a.isfinished - b.isfinished,
                 render: (text) => (
                     <span>
                         {text === '1' ? '已完成' : '未完成'}
@@ -388,7 +413,6 @@ class bk extends Component {
                     okText='确认'
                     cancelText='取消'
                 >
-
                     <div className="m-flex">
                         <span className="m-row">标题：</span>
                         <Input style={{ marginBottom: 20 }} placeholder="请输入标题" value={this.state.title} onChange={this.changeTitle}></Input>
@@ -421,13 +445,38 @@ class bk extends Component {
                     </div>
                 </Modal>
                 <div className="m-bottom" >
-                    <RangePicker locale={locale} onChange={this.onchange} defaultValue={[moment(this.state.time, dateFormat)]} />
+                    {/* <RangePicker locale={locale} onChange={this.onchange} defaultValue={[moment(this.state.time, dateFormat)]} /> */}
+                    <span>开始时间：</span>
+                    <DatePicker locale={locale} onChange={this.onchange} defaultValue={moment(this.state.time, dateFormat)} />
+                    <span className="m-left">结束时间：</span>
+                    <DatePicker locale={locale} onChange={this.onchangeEnd} defaultValue={moment(this.state.time, dateFormat)} />
                     <Button type="primary" style={{ marginLeft: 10 }} onClick={this.search}>
                         查询
                     </Button>
                 </div>
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
-                <Pagination className="m-Pleft" current={this.state.parmas.page} onChange={this.changePage} total={this.state.totalCount} />
+                <div className="m-Pleft m-flex">
+                    <Pagination
+                        current={this.state.parmas.page}
+                        onChange={this.changePage}
+                        total={this.state.totalCount}
+                        showTotal={total => `共 ${this.state.totalCount} 条`}
+                    />
+                    <div className="m-left">
+                        <Select defaultValue="10" style={{ width: 100 }} onChange={this.setPageSize}>
+                            <Option value="10">10/页</Option>
+                            <Option value="20">20/页</Option>
+                        </Select>
+                    </div>
+                    <div className="m-left">
+                        <span >跳转至 </span>
+                        <Input style={{ width: 60 }} onChange={this.numberonChange} ></Input>
+                        <span> 页 </span>
+                    </div>
+                    <div className="m-left">
+                        <Button onClick={this.search}>跳转</Button>
+                    </div>
+                </div>
             </div>
         );
     }
