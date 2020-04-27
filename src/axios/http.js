@@ -390,7 +390,10 @@ export const edit_own_class = (params) => {
 export const del_own_class = (params) => {
     return instance.post('/api/wrong/del_own_class', params)
 }
-
+//找错题
+export const get_recommend_question = (params) => {
+    return instance.post('/api/question/get_recommend_question', params)
+}
 
 
 

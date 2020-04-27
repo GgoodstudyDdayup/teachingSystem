@@ -332,9 +332,9 @@ class main extends Component {
                             <Menu.Item key="12">
                                 <Link to="/main/jiaoyanzu">教研组</Link>
                             </Menu.Item>
-                            <Menu.Item key="13">
+                            {/* <Menu.Item key="13">
                                 <Link to="/main/quanxian/CreatNewClass">错题分配</Link>
-                            </Menu.Item>
+                            </Menu.Item> */}
                         </SubMenu> : ''}
 
 

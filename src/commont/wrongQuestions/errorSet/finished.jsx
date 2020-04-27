@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Button, Select, Pagination, Divider, Drawer, Row, Col, Radio, Upload, Icon, message } from 'antd';
-import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list, get_analysis_option, analysis_question } from '../../../axios/http'
+import { Input, Button, Select, Pagination, Divider, Drawer, Row, Col, Radio, Upload, Icon, message,Modal } from 'antd';
+import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list, get_analysis_option, analysis_question, get_recommend_question } from '../../../axios/http'
 import { ContentUtils } from 'braft-utils'
 import BraftEditor from 'braft-editor'
 const { Option } = Select
@@ -46,6 +46,7 @@ const Main = (props) => {
     const [visible, setVisible] = useState(false)
     const [tixingOptions, setTixingOptions] = useState([])
     const [sourceOptions, setSourceOptions] = useState([])
+    const [modalVisible,setmodalVisible] = useState(false)
     // const [zjChildrenList, setZjChildrenList] = useState([])
     // const [knowlageList, setKnowlageList] = useState([])
     const [wrong_reasonOptions, setWrong_reasonOptions] = useState([])
@@ -274,6 +275,18 @@ const Main = (props) => {
         paramResult.student = e.target.value
         setParams({ ...paramResult })
     }
+    const aiquestion = e => {
+        get_recommend_question({ ques_id: 231278 }).then(res => {
+            console.log(res)
+            setmodalVisible(true)
+        })
+    }
+    const okModal = ()=> {
+        setmodalVisible(false)
+    }
+    const cancle = ()=>{
+        setmodalVisible(false)
+    }
     return (
         <div>
             <Drawer
@@ -408,7 +421,12 @@ const Main = (props) => {
                                                 <span>{res.student_str}</span>
                                     </p>
                                 </div>
-                                <Button type="primary" onClick={() => detail(res.id, res, res.text)}>编辑点评</Button>
+                                <div className="m-flex">
+                                    <Button type="primary" onClick={() => aiquestion(res.id)}>AI找题</Button>
+                                    <QuestionModal modalVisible={modalVisible} cancle={cancle} ok={okModal}></QuestionModal>
+                                    <div style={{width:10}}></div>
+                                    <Button type="primary" onClick={() => detail(res.id, res, res.text)}>编辑点评</Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -416,6 +434,28 @@ const Main = (props) => {
             </div>
             <Pagination className="m-Pleft" current={paramResult.page} onChange={changePage} total={totalCount} />
         </div >
+    )
+}
+const QuestionModal = (props)=>{
+    const ok = ()=>{
+        props.ok()
+    }
+    const cancle = ()=>{
+        props.cancle()
+    }
+    return(
+        <div>
+            <Modal
+            visible={props.modalVisible}
+            onOk={ok}
+            onCancel={cancle}
+            okText="确认"
+            cancelText="取消"
+
+            >
+
+            </Modal>
+        </div>
     )
 }
 export default Main
