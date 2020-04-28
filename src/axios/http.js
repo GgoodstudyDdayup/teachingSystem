@@ -394,6 +394,27 @@ export const del_own_class = (params) => {
 export const get_recommend_question = (params) => {
     return instance.post('/api/question/get_recommend_question', params)
 }
+//插入推荐相关试题
+export const add_wrong_question_cart = (params) => {
+    return instance.post('/api/wrong/add_wrong_question_cart', params)
+}
+//获取当前 错题试题篮列表
+export const get_wrong_question_cartstion_cart = (params) => {
+    return instance.post('/api/wrong/get_wrong_question_cart', params)
+}
+//获取ai提篮里的题id
+export const getques_ids_cart = (params) => {
+    return instance.get('/api/wrong/get_ques_ids_cart', params)
+}
+
+//移除错题篮题目
+export const remove_wrong_cart = (params) => {
+    return instance.post('/api/wrong/remove_wrong_cart', params)
+}
+//提交错题篮题目
+export const submit_wrong_question_cart = (params) => {
+    return instance.post('/api/wrong/submit_wrong_question_cart', params)
+}
 
 
 

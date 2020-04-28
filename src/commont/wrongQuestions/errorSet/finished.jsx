@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Button, Select, Pagination, Divider, Drawer, Row, Col, Radio, Upload, Icon, message,Modal } from 'antd';
-import { get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list, get_analysis_option, analysis_question, get_recommend_question } from '../../../axios/http'
+import { useHistory } from "react-router-dom"
+import { Input, Badge, Button, Select, Pagination, Divider, Drawer, Row, Col, Radio, Upload, Icon, message, Modal } from 'antd';
+import {
+    get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list, get_analysis_option, analysis_question, get_recommend_question,
+    submit_wrong_question_cart,
+    remove_wrong_cart,
+    getques_ids_cart,
+    get_wrong_question_cartstion_cart,
+    add_wrong_question_cart
+} from '../../../axios/http'
 import { ContentUtils } from 'braft-utils'
 import BraftEditor from 'braft-editor'
+import List from './list'
 const { Option } = Select
 const Main = (props) => {
     //搜索
@@ -32,6 +41,7 @@ const Main = (props) => {
     }
     let list = []
     let count = 0
+    let history = useHistory()
     const editorState = BraftEditor.createEditorState(null)
     const [editor, setEditorState] = useState(editorState)
     const [paramResult, setParams] = useState(params)
@@ -46,7 +56,14 @@ const Main = (props) => {
     const [visible, setVisible] = useState(false)
     const [tixingOptions, setTixingOptions] = useState([])
     const [sourceOptions, setSourceOptions] = useState([])
-    const [modalVisible,setmodalVisible] = useState(false)
+    const [modalVisible, setmodalVisible] = useState(false)
+    const [cardTotal, setcardTotal] = useState(0)
+    const [clear, setClear] = useState('none')
+    const [listAI, setList] = useState([])
+    const [recommend_ques_id, setrecommend_ques_id] = useState('')
+    const [studentIds, setstudentIds] = useState('')
+    const [quesIds, setquesIds] = useState('')
+    const [question_cart, setquestion_cart] = useState([])
     // const [zjChildrenList, setZjChildrenList] = useState([])
     // const [knowlageList, setKnowlageList] = useState([])
     const [wrong_reasonOptions, setWrong_reasonOptions] = useState([])
@@ -84,7 +101,6 @@ const Main = (props) => {
             type: 1
         }
     }
-
     const extendControls = [
         {
             key: 'antd-uploader',
@@ -111,7 +127,13 @@ const Main = (props) => {
     }, [height])
     //获取默认的学科和年级数据
     useEffect(() => {
-        console.log(11)
+        get_wrong_question_cartstion_cart().then(res => {
+            setquestion_cart(res.data.list)
+            setcardTotal(res.data.list.length)
+        })
+        getques_ids_cart().then(res => {
+            setquesIds(res.data.cart_ques_ids)
+        })
         wrong_get_list({
             xiaoguanjia_subject_id: '',
             xiaoguanjia_grade_id: '',
@@ -140,6 +162,29 @@ const Main = (props) => {
             setGradechildren([...gradechildren])
         })
     }, [props.count])
+    const getCardIds = () => {
+        getques_ids_cart().then(res => {
+            setquesIds(res.data.cart_ques_ids)
+        })
+    }
+    const getLists = () => {
+        get_wrong_question_cartstion_cart().then(res => {
+            
+            setquestion_cart(res.data.list)
+            setcardTotal(res.data.list.length)
+        })
+    }
+    const removeQues = (id) => {
+        remove_wrong_cart({ recommend_ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                getCardIds()
+                getLists()
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
     const cancel = e => {
         setVisible(false)
         const drawerParamResult = {
@@ -275,20 +320,67 @@ const Main = (props) => {
         paramResult.student = e.target.value
         setParams({ ...paramResult })
     }
-    const aiquestion = e => {
+    //AI找题操作
+    const aiquestion = (e, xiaoguanjia_student_ids) => {
         get_recommend_question({ ques_id: 231278 }).then(res => {
-            console.log(res)
+            setList(res.data.list)
+            setrecommend_ques_id(231278)
+            setstudentIds(xiaoguanjia_student_ids)
             setmodalVisible(true)
         })
     }
-    const okModal = ()=> {
+    const okModal = () => {
         setmodalVisible(false)
     }
-    const cancle = ()=>{
+    const cancle = () => {
         setmodalVisible(false)
+    }
+    //鼠标移动交互操作
+    const mouse = (e) => {
+        if (e) {
+            setClear('block')
+        } else {
+            setClear('none')
+        }
+    }
+    const zujuan = ()=>{
+        localStorage.setItem('setquestion_cart',JSON.stringify(question_cart))
+        history.push('/main/wrongQuestion/errorSet/zujuan')
     }
     return (
         <div>
+            <div className="m-shopcar" onMouseEnter={() => mouse('enter')} onMouseLeave={() => mouse()}>
+                <Icon type="container" style={{ margin: `0 15px 0 0` }} />
+                    我的AI题篮
+                    <Badge count={cardTotal} className="m-shopicon">
+                </Badge>
+            </div>
+            <div className="topic-panel" style={{ display: clear, zIndex: 9999 }} onMouseEnter={() => mouse('enter')} onMouseLeave={() => mouse()}>
+                <div className="topic-row header">
+                    <div className="topic-col">题目</div>
+                    <div className="topic-col">数量</div>
+                    <div className="topic-col">删除</div>
+                </div>
+                {question_cart.map(res =>
+                    <div className="topic-bd" key={res.id}>
+                        <div className="topic-row">
+                            <div className="topic-col">
+                                {res.ques_type_name}
+                            </div>
+                            {/* <div className="topic-col">
+                                {res.count}
+                            </div> */}
+                            <div className="topic-col">
+                                <Icon type="close" onClick={() => removeQues(res.recommend_ques_id)} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div className="topic-ctrls">
+                    {/* <div className="clear-btn" >清空全部</div> */}
+                    <div className="see-btn" onClick={zujuan}>查看AI试卷</div>
+                </div>
+            </div>
             <Drawer
                 title="错题点评"
                 placement="right"
@@ -422,9 +514,9 @@ const Main = (props) => {
                                     </p>
                                 </div>
                                 <div className="m-flex">
-                                    <Button type="primary" onClick={() => aiquestion(res.id)}>AI找题</Button>
-                                    <QuestionModal modalVisible={modalVisible} cancle={cancle} ok={okModal}></QuestionModal>
-                                    <div style={{width:10}}></div>
+                                    <Button type="primary" onClick={() => aiquestion(res.id, res.xiaoguanjia_student_ids)}>AI找题</Button>
+                                    <QuestionModal getLists={getLists} getCardIds={getCardIds} quesIds={quesIds} modalVisible={modalVisible} list={listAI} recommend_ques_id={recommend_ques_id} studentIds={studentIds} cancle={cancle} ok={okModal}></QuestionModal>
+                                    <div style={{ width: 10 }}></div>
                                     <Button type="primary" onClick={() => detail(res.id, res, res.text)}>编辑点评</Button>
                                 </div>
                             </div>
@@ -436,24 +528,66 @@ const Main = (props) => {
         </div >
     )
 }
-const QuestionModal = (props)=>{
-    const ok = ()=>{
+const QuestionModal = (props) => {
+    const ok = () => {
         props.ok()
     }
-    const cancle = ()=>{
+    const cancle = () => {
         props.cancle()
     }
-    return(
+    const moveOrAdd = (id) => {
+        let cart_ques_ids = props.quesIds
+        let result = ''
+        if (typeof (cart_ques_ids) !== 'object') {
+            let strArray = cart_ques_ids.split(',')
+            strArray.forEach(res => {
+                if (res === id) {
+                    result = true
+                }
+            })
+        } else {
+            result = false
+        }
+        return result
+    }
+    const addQuestoin = (e, id) => {
+        e.stopPropagation()
+        add_wrong_question_cart({ wrong_question_id: props.recommend_ques_id, recommend_ques_id: id, xiaoguanjia_student_ids: props.studentIds }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                props.getCardIds()
+                props.getLists()
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    const deleteQuestoin = (e, id) => {
+        e.stopPropagation()
+        remove_wrong_cart({ recommend_ques_id: id }).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                props.getCardIds()
+                props.getLists()
+            } else {
+                message.error(res.message)
+            }
+        })
+    }
+    return (
         <div>
             <Modal
-            visible={props.modalVisible}
-            onOk={ok}
-            onCancel={cancle}
-            okText="确认"
-            cancelText="取消"
-
+                title="AI找题"
+                visible={props.modalVisible}
+                onOk={ok}
+                onCancel={cancle}
+                okText="确认"
+                cancelText="取消"
             >
-
+                <div style={{ height: 600, overflowY: 'scroll' }}>
+                    <List data={props.list} deleteQuestoin={deleteQuestoin} addQuestoin={addQuestoin} moveOrAdd={moveOrAdd}>
+                    </List>
+                </div>
             </Modal>
         </div>
     )

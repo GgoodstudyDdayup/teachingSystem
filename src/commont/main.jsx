@@ -30,6 +30,7 @@ import ExerciseBook from './wrongQuestions/exerciseBook/index'
 import ExerciseBookInfo from './wrongQuestions/exerciseBook/info'
 import ReportForm from './wrongQuestions/reportForm/index'
 import CreatNewClass from './quanxian/creatnewclass'
+import ZujuanError from '../commont/wrongQuestions/errorSet/zujuan/zujuan'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -265,16 +266,6 @@ class main extends Component {
                         >
                         </SubMenu>
                         <SubMenu
-                            key="22"
-                            title={
-                                <span>
-                                    <Icon type="mail" />
-                                    <span>资源管理</span>
-                                </span>
-                            }
-                        >
-                        </SubMenu>
-                        <SubMenu
                             key="ss"
                             title={
                                 <span>
@@ -401,7 +392,7 @@ class main extends Component {
                             background: '#fff',
                             minHeight: 280,
                         }}
-                        className={this.props.location.pathname === '/main/zujuan' || this.props.location.pathname === '/main/wrongQuestion/reportForm' ? 'conntent-none' : ''}
+                        className={this.props.location.pathname === '/main/zujuan' || this.props.location.pathname === '/main/wrongQuestion/reportForm'||this.props.location.pathname === '/main/wrongQuestion/errorSet/zujuan' ? 'conntent-none' : ''}
                     >
                         <Switch>
                             {/* 题库管理 */}
@@ -428,13 +419,13 @@ class main extends Component {
                             <Route path="/main/bk/kejian" component={Kj} />
                             <Route path="/main/quanxian" exact component={Quanxian} />
                             <Route path="/main/quanxian/CreatNewClass" component={CreatNewClass} />
-                            
+
                             <Route path="/main/jiaoyanzu" component={Jiaoyanzu} />
                             {/* 错题管理 */}
-                            <Route path="/main/wrongQuestion/errorSet" component={ErrorSet} />
+                            <Route path="/main/wrongQuestion/errorSet" exact component={ErrorSet} />
                             <Route path="/main/wrongQuestion/exerciseBook" exact component={ExerciseBook} />
                             <Route path="/main/wrongQuestion/exerciseBook/info" component={ExerciseBookInfo} />
-                            
+
 
 
                             <Route path="/main/zy" component={ZY} />
@@ -442,6 +433,9 @@ class main extends Component {
                         </Switch>
 
                     </Content>
+                    <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/wrongQuestion/errorSet/zujuan' ? '' : 'conntent-none'}>
+                        <Route path="/main/wrongQuestion/errorSet/zujuan" component={ZujuanError} />
+                    </div>
                     <div style={{ padding: 24, minHeight: 280 }} className={this.props.location.pathname === '/main/zujuan' ? '' : 'conntent-none'}>
                         <Route path="/main/zujuan" component={Zujuan} />
                     </div>
