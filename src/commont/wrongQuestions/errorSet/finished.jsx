@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom"
 import { Input, Badge, Button, Select, Pagination, Divider, Drawer, Row, Col, Radio, Upload, Icon, message, Modal } from 'antd';
 import {
     get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, wrong_get_list, get_analysis_option, analysis_question, get_recommend_question,
-    submit_wrong_question_cart,
+    
     remove_wrong_cart,
     getques_ids_cart,
     get_wrong_question_cartstion_cart,

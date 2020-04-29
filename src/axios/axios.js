@@ -18,12 +18,12 @@ axios.defaults.transformRequest = [
 ]
 const instance = axios.create({
     headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
     // withCredentials: true
 })
 instance.interceptors.request.use(function (config) {
-    config.headers['username'] = localStorage.getItem("username")
+    config.headers['username'] = encodeURI(localStorage.getItem("username"))
     config.headers['token'] = localStorage.getItem("token")
     config.headers['companyid'] = localStorage.getItem("company_id")
     NProgress.start()
@@ -45,7 +45,12 @@ instance.interceptors.response.use(response => {
 });
 const studentInstance = axios.create({
     headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    },
+})
+const companyId = axios.create({
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
 })
 studentInstance.interceptors.request.use(function (config) {
@@ -57,8 +62,29 @@ studentInstance.interceptors.request.use(function (config) {
 }, function (error) {
     return Promise.reject(error);
 });
-
 studentInstance.interceptors.response.use(response => {
+    if (response.data.code === '404') {
+        window.location.replace("http://jiaoxue.yanuojiaoyu.com/#/studentLogin");
+    } else {
+        NProgress.done()
+        return response.data
+    }
+}, err => {
+    message.warning('系统繁忙请稍后重试')
+    return Promise.reject(err);
+});
+
+
+companyId.interceptors.request.use(function (config) {
+    config.headers['username'] = encodeURI(localStorage.getItem("username"))
+    config.headers['token'] = localStorage.getItem("token")
+    config.headers['companyid'] = localStorage.getItem("company_id")
+    NProgress.start()
+    return config
+}, function (error) {
+    return Promise.reject(error);
+});
+companyId.interceptors.response.use(response => {
     if (response.data.code === '404') {
         window.location.replace("http://jiaoxue.yanuojiaoyu.com/#/studentLogin");
     } else {
@@ -71,4 +97,4 @@ studentInstance.interceptors.response.use(response => {
 });
 const loginPost = axios
 const downLoad = axios
-export { instance, loginPost, downLoad,studentInstance } 
+export { instance, loginPost, downLoad, studentInstance, companyId } 

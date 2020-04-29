@@ -1,4 +1,4 @@
-import { instance, loginPost, downLoad, studentInstance } from './axios'
+import { instance, loginPost, downLoad, studentInstance,companyId } from './axios'
 //login为了获取token
 export const login = (params) => {
     return loginPost.post('/api/user/login', params)
@@ -188,7 +188,7 @@ export const get_user_by_set = () => {
 }
 //获取公司列表
 export const get_company_list = () => {
-    return instance.get('/api/system/get_company_list')
+    return companyId.post('/api/system/get_company_list')
 }
 //多校区设置
 export const set_user_school_rela = (params) => {

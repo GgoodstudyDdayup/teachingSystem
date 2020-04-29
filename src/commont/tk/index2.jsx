@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, message, BackTop } from 'antd';
+import { Tabs, Spin, Badge, Icon, message, BackTop, Button } from 'antd';
 import Select from './selection'
 import Know from './knowlist'
 import List from './list'
+import Searchbtn from './searchbtn'
 import { tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type, get_paper_info } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
@@ -15,23 +16,7 @@ class tikuguanli2 extends Component {
             list: [
 
             ],
-            searchList: [{
-                name: '题型',
-                h: 13,
-                list: [{ id: 13, title: '不限' }, { id: 1, title: '解答' }, { id: 2, title: '判断' }, { id: 3, title: '填空' }]
-            }, {
-                name: '年份',
-                h: 14,
-                list: [{ id: 14, title: '不限' }, { id: 4, title: '171' }, { id: 5, title: '4171' }, { id: 6, title: '4141' }]
-            }, {
-                name: '来源',
-                h: 15,
-                list: [{ id: 15, title: '不限' }, { id: 7, title: '888' }, { id: 8, title: '888' }, { id: 9, title: '888' }]
-            }, {
-                name: '难度',
-                h: 16,
-                list: [{ id: 16, title: '不限' }, { id: 10, title: '999' }, { id: 11, title: '999' }, { id: 12, title: '999' }]
-            }],
+            searchList: [],
             params: {
                 subject_id: 39,
                 province_id: '',
@@ -125,12 +110,16 @@ class tikuguanli2 extends Component {
                 })
                 break
         }
-        question(params).then(res => {
-            this.setState({
-                list: res.data.list,
-                totalCount: Number(res.data.total_count)
-            })
+        console.log(params)
+        this.setState({
+            params
         })
+        // question(params).then(res => {
+        //     this.setState({
+        //         list: res.data.list,
+        //         totalCount: Number(res.data.total_count)
+        //     })
+        // })
     }
     //查看答案的伸缩
     add = (e) => {
@@ -367,16 +356,20 @@ class tikuguanli2 extends Component {
             message.error(err)
         })
     }
-    listView = e => {
+    listView = (e,page) => {
         const params = { ...this.state.params }
-        params.page = 1
+        params.page = page
         get_paper_info({ paper_id: e }).then(res => {
-            console.log(res)
             this.setState({
                 params,
                 list: res.data.ques_list
             })
         })
+    }
+    changePage=(e)=>{
+        const params = this.state.params
+        params.page = e
+        this.setState({params})
     }
     // keyWord = e => {
     //     const params = { ...this.state.params }
@@ -400,6 +393,11 @@ class tikuguanli2 extends Component {
     };
     zujuan = () => {
         this.props.history.push('/main/zujuan')
+    }
+    preview = (data) => {
+        console.log(this.state.list)
+        localStorage.setItem('previewData', JSON.stringify(this.state.list))
+        window.open('/#/ztPreview')
     }
     render() {
         return (
@@ -446,15 +444,16 @@ class tikuguanli2 extends Component {
                     <TabPane tab="真题试卷" key="2" >
                         <div className="knowlage">
                             <div className="tree" >
-                                <Know params={this.state.params} listView={this.listView}></Know>
+                                <Know changePage={this.changePage} params={this.state.params} listView={this.listView}></Know>
                             </div>
                             <div >
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600, width: '100%' } : { height: 400, width: '100%' }}>
                                     <div>
-                                        {/* <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn> */}
+                                        <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                         {/* <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton /> */}
                                         {/* <div className="m-scroll-list"> */}
-                                        <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
+                                        <Button onClick={this.preview}>预览试卷</Button>
+                                        <List  data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}></List>
                                         {/* </div> */}
                                         <BackTop target={() => document.getElementById('scroll-y')} />
                                     </div>

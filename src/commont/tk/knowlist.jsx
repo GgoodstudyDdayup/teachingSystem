@@ -8,7 +8,8 @@ const Knowlage = (props) => {
     const [count, setCount] = useState(1)
     const [shijuanList, setShijuanList] = useState('')
     const onChangePage = (e) => {
-        props.params.page = e
+        // props.params.page = e
+        props.changePage(e)
         setCount(e)
         ztshijuan(props.params).then(res => {
             setTotal_count(Number(res.data.total_count))
@@ -16,13 +17,11 @@ const Knowlage = (props) => {
         })
     }
     useEffect(() => {
-        props.params.page = 1
         ztshijuan(props.params).then(res => {
             setTotal_count(Number(res.data.total_count))
             setShijuanList(res.data.list)
-            setCount(1)
         })
-    }, [props.params])
+    }, [props])
     return (
         <div style={{width:270}}>
             {/* <Search
@@ -39,7 +38,7 @@ const Knowlage = (props) => {
                     size='small'
                     renderItem={item => (
                         <List.Item
-                            onClick={() => props.listView(item.aitifen_id)}
+                            onClick={() => props.listView(item.aitifen_id,count)}
                         >
                             <List.Item.Meta
                                 avatar={<Avatar src={require('../../img/shijuan.png')} />}

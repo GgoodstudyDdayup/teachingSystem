@@ -44,6 +44,7 @@ class bk extends Component {
                 course_url: ''
             },
             totalCount: 100,
+            count:this.totalCount,
             obj: {
                 has_zhishijingjiang: '知识精讲',
                 has_sandianpouxi: '三点剖析',
@@ -55,6 +56,7 @@ class bk extends Component {
             fileList: [],
             checkList: [],
             visible: false,
+            
             data: [
             ]
         }
@@ -65,7 +67,7 @@ class bk extends Component {
         const parmas = this.state.parmas
         parmas['starttime'] = time
         parmas['endtime'] = time
-        console.log(parmas)
+        const count = this.state.totalCount
         paike(parmas).then(res => {
             const list = res.data.list.map((res, index) => {
                 res.key = `${index}`
@@ -75,7 +77,8 @@ class bk extends Component {
                 data: list,
                 totalCount: Number(res.data.total_count),
                 time,
-                parmas
+                parmas,
+                count:Number(res.data.total_count)
             })
         })
     }
@@ -270,6 +273,7 @@ class bk extends Component {
             this.setState({
                 data: list,
                 totalCount: Number(res.data.total_count),
+                count:Number(res.data.total_count),
                 parmas
             })
         })
@@ -305,9 +309,12 @@ class bk extends Component {
     }
     setPageSize = e => {
         const parmas = this.state.parmas
+        const count = this.state.totalCount
         parmas.page_size = e
         this.setState({
-            parmas
+            parmas,
+            count:Math.ceil(Number(count)/Number(e)*10)
+            
         })
     }
     numberonChange = e => {
@@ -457,9 +464,8 @@ class bk extends Component {
                 <Table rowKey={record => record.key} columns={columns} dataSource={this.state.data} pagination={false} scroll={{ y: 500 }} />
                 <div className="m-Pleft m-flex">
                     <Pagination
-                        current={this.state.parmas.page}
                         onChange={this.changePage}
-                        total={this.state.totalCount}
+                        total={this.state.count}
                         showTotal={total => `共 ${this.state.totalCount} 条`}
                     />
                     <div className="m-left">

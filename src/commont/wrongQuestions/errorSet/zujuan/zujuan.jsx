@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { message, Select, Button } from 'antd';
-import { get_own_subject_list, get_grade_list, set_self_pager } from '../../../../axios/http'
+import { message, Select, Button, Modal, Input } from 'antd';
+import { get_own_subject_list, get_grade_list, submit_wrong_question_cart } from '../../../../axios/http'
 import List from './zujuanList'
 const { Option } = Select;
 // 重新记录数组顺序
@@ -9,6 +9,9 @@ export default class ReactBeautifulDnd extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            saveparams:{
+                title:''
+            },
             waring: false,
             items: [],
             zujuanAppear: false,
@@ -142,57 +145,22 @@ export default class ReactBeautifulDnd extends Component {
     }
     //试卷提交
     sjAction = () => {
-        const biaotiTitle = this.state.biaotiTitle
-        const datiTime = this.state.datiTime
-        const saveFile = this.state.saveFile
-        saveFile.title = biaotiTitle
-        saveFile.total_minute = datiTime
-        console.log(this.state.totalNum)
-        if (biaotiTitle === '点击修改试卷标题' || datiTime === '' || this.state.totalNum === 0) {
-            message.warning('请检查标题、考试时间、分值设置')
-        } else {
-            set_self_pager(saveFile).then(res => {
-                if (res.code === 0) {
-                    message.success(res.message)
-                    this.setState({
-                        visible2: false,
-                        saveFile: {
-                            grade_id: '',
-                            title: '',
-                            total_minute: '',
-                            remark: '',
-                            own_subject_id: '',
-                            difficulty_id: '',
-                            is_open: ''
-                        },
-                        subjectValue: '',
-                        grandValue: ''
-                    });
-                    setTimeout(() => {
-                        this.props.history.push('/main')
-                    }, 2000);
-
-                } else {
-                    message.error(res.message)
-                }
-            })
-        }
-
+        const saveparams = this.state.saveparams
+        submit_wrong_question_cart(saveparams).then(res=>{
+            if(res.code===0){
+                message.success(res.message)
+                this.props.history.push('/main/wrongQuestion/errorSet')
+            }else{
+                message.error(res.message)
+            }
+        })
     }
     sjCancel = (e) => {
+        const saveparams= this.state.saveparams
+        saveparams.title = ''
         this.setState({
             visible2: false,
-            saveFile: {
-                grade_id: '',
-                title: '',
-                total_minute: '',
-                remark: '',
-                own_subject_id: '',
-                difficulty_id: '',
-                is_open: ''
-            },
-            subjectValue: '',
-            grandValue: ''
+            saveparams
         });
     }
     changeTotalNum = (e, id, num) => {
@@ -275,9 +243,29 @@ export default class ReactBeautifulDnd extends Component {
         localStorage.setItem('previewData', JSON.stringify(this.state.previewData))
         window.open('/#/setPreview')
     }
+    aichangename=(e)=>{
+        const saveparams = {...this.state.saveparams}
+        saveparams.title = e.target.value
+        this.setState({
+            saveparams
+        })
+    }
     render() {
         return (
             <div>
+                <Modal
+                    title="AI组卷提交"
+                    visible={this.state.visible2}
+                    okText="确认"
+                    cancelText="取消"
+                    onCancel={this.sjCancel}
+                    onOk={this.sjAction}
+                >
+                    <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
+                        <span className="m-row" style={{ textAlign: 'right' }}>AI卷名：</span>
+                        <Input placeholder="请输入卷名" onChange={this.aichangename} value={this.state.saveparams.title}></Input>
+                    </div>
+                </Modal>
                 <div id="m-zujuan" style={{ background: '#F5F5F5', display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
                     <div style={{ width: '100%' }}>
                         <div>
