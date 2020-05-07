@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined } from '@ant-design/icons'
+// , RadarChartOutlined, ContainerOutlined
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -12,8 +13,8 @@ import Recommended from './resourceCenter/recommended/index/index'
 import RecommendedReal from './resourceCenter/recommended/real/real'
 import RecommendedShare from './resourceCenter/recommended/share/share'
 import RecommendedJigousiku from './resourceCenter/recommended/jigousiku/jigousiku'
-// import Myresources from './resourceCenter/myResources/index/index'
-// import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
+import Myresources from './resourceCenter/myResources/index/index'
+import MyresourcesWenjianjia from './resourceCenter/myResources/wenjianku/wenjianku'
 import Myzujuan from './resourceCenter/myResources/zujuanList/index'
 import BK from './bk/bk'
 import Prograss from './bk/prograss'
@@ -146,6 +147,9 @@ class main extends Component {
             })
         }
     }
+    dataImg = ()=>{
+        window.open('http://zt.zhongxiaoxue.cn/node/build/#/dataImg')
+    }
     render() {
         const menu = (
             <Menu>
@@ -213,7 +217,7 @@ class main extends Component {
                                 <Link to="/main/bk/kejian">组卷审核</Link>
                             </Menu.Item>}
                         </SubMenu>
-                        <SubMenu
+                        {/* <SubMenu
                             key="sub22"
                             title={
                                 <span>
@@ -228,13 +232,19 @@ class main extends Component {
                             <Menu.Item key="225">
                                 <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
                             </Menu.Item>
-                        </SubMenu>
-                        <Menu.Item key="227">
+                        </SubMenu> */}
+                        {/* <Menu.Item key="227">
                             <ContainerOutlined />
                             <span>电子练习册
                             </span>
                             <Link to='/main/wrongQuestion/exerciseBook'></Link>
-                        </Menu.Item>
+                        </Menu.Item> */}
+                        {/* <Menu.Item key="228" onClick={this.dataImg}>
+                            <ContainerOutlined />
+                            <span>REP学员数据报表
+                            </span>
+                            <Link to='/dataImg'></Link>
+                        </Menu.Item> */}
                         {/* <SubMenu
                             key="55"
                             title={
@@ -254,8 +264,8 @@ class main extends Component {
                                 </span>
                             }
                         >
-                        </SubMenu>
-                        <SubMenu
+                        </SubMenu> */}
+                        {/* <SubMenu
                             key="33"
                             title={
                                 <span>
@@ -264,8 +274,8 @@ class main extends Component {
                                 </span>
                             }
                         >
-                        </SubMenu>
-                        <SubMenu
+                        </SubMenu> */}
+                        {/* <SubMenu
                             key="ss"
                             title={
                                 <span>
@@ -284,10 +294,6 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="7">Option 9</Menu.Item>
-                            <Menu.Item key="8">Option 10</Menu.Item>
-                            <Menu.Item key="9">Option 11</Menu.Item>
-                            <Menu.Item key="10">Option 12</Menu.Item>
                         </SubMenu> */}
                         <SubMenu
                             key="sub6"
@@ -298,11 +304,14 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            {/* <Menu.Item key="13">
+                            <Menu.Item key="13">
                                 <Link to="/main/resourceCenter/recommended">推荐资源</Link>
-                            </Menu.Item> */}
+                            </Menu.Item>
                             <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/zj">我的资源</Link>
+                            </Menu.Item>
+                            <Menu.Item key="20">
+                                <Link to="/main/resourceCenter/myresources/wenjianjia">我的资源文件夹</Link>
                             </Menu.Item>
                             <Menu.Item key="15">
                                 <Link to="/main/zhangjie">章节知识点关联</Link>
@@ -323,12 +332,10 @@ class main extends Component {
                             <Menu.Item key="12">
                                 <Link to="/main/jiaoyanzu">教研组</Link>
                             </Menu.Item>
-                            {/* <Menu.Item key="13">
-                                <Link to="/main/quanxian/CreatNewClass">错题分配</Link>
-                            </Menu.Item> */}
+                            <Menu.Item key="13">
+                                <Link to="/main/quanxian/CreatNewClass">班级分配</Link>
+                            </Menu.Item>
                         </SubMenu> : ''}
-
-
                     </Menu>
                 </Sider>
                 <Layout>
@@ -410,8 +417,8 @@ class main extends Component {
                             <Route path="/main/resourceCenter/recommended/real" component={RecommendedReal}></Route>
                             <Route path="/main/zhangjie" component={Zj}></Route>
                             {/* 资源中心的我的资源 */}
-                            {/* <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route> */}
-                            {/* <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route> */}
+                            <Route path="/main/resourceCenter/myresources/wenjianjia" exact component={Myresources}></Route>
+                            <Route path="/main/resourceCenter/myresources" component={MyresourcesWenjianjia}></Route>
                             <Route path="/main/resourceCenter/zj" component={Myzujuan}></Route>
 
                             <Route path="/main/bk" exact component={BK} />
@@ -426,8 +433,8 @@ class main extends Component {
                             <Route path="/main/wrongQuestion/exerciseBook" exact component={ExerciseBook} />
                             <Route path="/main/wrongQuestion/exerciseBook/info" component={ExerciseBookInfo} />
 
-
-
+                            
+                            
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>

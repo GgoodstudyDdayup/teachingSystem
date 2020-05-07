@@ -27,6 +27,7 @@ class bk extends Component {
                 password: '',
                 name: '',
                 mobile: '',
+                state: '',
                 permission: '',
                 teacher_type: '',
                 grade_ids: '',
@@ -57,7 +58,8 @@ class bk extends Component {
             permission2: [],
             data: [
             ],
-            selsectSchool: []
+            selsectSchool: [],
+            state:''
         }
     }
     componentDidMount() {
@@ -465,6 +467,14 @@ class bk extends Component {
             upParmas
         })
     }
+    onchangeStateRadio2 = (e) => {
+        const upParmas = this.state.upParmas
+        upParmas.state = e.target.value
+        this.setState({
+            state: e.target.value,
+            upParmas
+        })
+    }
     onChangeteachType = e => {
         const upParmas = this.state.upParmas
         upParmas.teacher_type = e.target.value
@@ -498,7 +508,6 @@ class bk extends Component {
         }
     }
     quanxianTag = (e) => {
-        console.log(e)
         const permission = [{
             id: '1',
             name: "系统管理员"
@@ -807,6 +816,17 @@ class bk extends Component {
                 ),
             },
             {
+                title: '状态',
+                dataIndex: 'state',
+                key: 'state',
+                align: 'center',
+                render: (text) => (
+                    <span>
+                        {text==='1'?<Tag color='green'>正常</Tag>:<Tag color='magenta'>冻结</Tag>}
+                    </span>
+                ),
+            },
+            {
                 title: '操作',
                 key: 'action',
                 align: 'center',
@@ -900,6 +920,13 @@ class bk extends Component {
                     <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap' }}>
                         <span className="m-row" style={{ textAlign: 'right' }}>手机号码：</span>
                         <Input text='password' value={this.state.upParmas.mobile} onChange={(e) => this.setUsername(e, 'mobile')} placeholder="请输入手机号码"></Input>
+                    </div>
+                    <div className="m-flex m-bottom">
+                        <span className="m-row">账户状态：</span>
+                        <Radio.Group onChange={this.onchangeStateRadio2} value={this.state.state}>
+                            <Radio value={1}>正常</Radio>
+                            <Radio value={2}>冻结</Radio>
+                        </Radio.Group>
                     </div>
                     <div className="m-flex m-bottom">
                         <span className="m-row">权限设置：</span>

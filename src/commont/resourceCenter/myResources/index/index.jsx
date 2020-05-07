@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, Upload, message } from 'antd';
+import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, message } from 'antd';
+import { create_directory, get_directory, edit_directory, del_directory, get_directory_file, edit_file, del_directory_file } from '../../../../axios/http'
 import Tablelink from './indexlink'
 const { confirm } = Modal;
 const { TabPane } = Tabs;
@@ -17,6 +18,15 @@ class Myresources extends Component {
             },
             newWrite: {
             },
+            params: {
+                name: '',
+                parent_id: 0
+            },
+            params2: {
+                resources_file_id: '',
+                file_name: '',
+            },
+            changeId: '',
             selectedRowKeys: [], // Check here to configure the default column
         }
     }
@@ -31,39 +41,30 @@ class Myresources extends Component {
     }
     //初始化数据
     componentDidMount() {
-        const data = [{
-            key: 0,
-            name: `Edward King 0`,
-            time: `2020-2-22 14:50`,
-            state: 1
-        }, {
-            key: 1,
-            name: `Edward King 1`,
-            time: `2020-2-22 14:50`,
-            state: 2
-        }, {
-            key: 2,
-            name: `Edward King 2`,
-            time: `2020-2-22 14:50`,
-            state: 3
-        }];
-        this.setState({
-            data
+        get_directory().then(res => {
+            const newData = res.data.list.reduce((item, res) => {
+                if (res.children) {
+                    delete res.children
+                }
+                item.push(res)
+                return item
+            }, [])
+            this.setState({
+                data: newData,
+                tree: res.data.list
+            })
         })
     }
-
     searchId = (e) => {
-        console.log(e)
-        //查询确认那个文件夹
-        const data = this.state.data
-        const id = data.reduce((res, ele) => {
-            if (ele.name === e) {
-                res['key'] = ele.key
-            }
-            return res
-        }, {})
-        //异步操作
-        console.log(id)
+        get_directory_file({ resources_id: e.id }).then(res => {
+            const newArr = res.data.list.concat(res.data.directory_list)
+            this.setState({
+                data: newArr,
+                visible: false,
+                visible2: false,
+                changeId: e.id
+            })
+        })
     }
     onSelectChange = selectedRowKeys => {
         const data = this.state.data
@@ -96,61 +97,168 @@ class Myresources extends Component {
     showDeleteConfirm = (text) => {
         confirm({
             title: '你确定要删除吗',
-            content: `${text}`,
+            content: `删除数据将会消失`,
             okText: '删除',
             okType: 'danger',
             cancelText: '取消',
             onOk: () => {
-                console.log(text);
+                del_directory({ resources_id: text.id }).then(res => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                        get_directory().then(res => {
+                            const newData = res.data.list.reduce((item, res) => {
+                                if (res.children) {
+                                    delete res.children
+                                }
+                                item.push(res)
+                                return item
+                            }, [])
+                            this.setState({
+                                data: newData,
+                                tree: res.data.list,
+                                visible: false
+                            })
+                        })
+                    }
+                })
             },
             onCancel() {
                 console.log('Cancel');
             },
         });
     }
-    showRwriteConfirm = () => {
-        if (this.state.title === '新建文件夹') {
-            console.log('new')
-            const data = this.state.data
-            data.push({
-                key: 6,
-                name: `Edward King 5`,
-                time: '000',
-                state: 1
-            })
-            message.success('添加成功')
-            this.setState({
-                data,
-                visible: false
+    showDeleteConfirm2 = (text) => {
+        confirm({
+            title: '你确定要删除吗',
+            content: `删除数据将会消失`,
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: () => {
+                del_directory_file({ resources_file_id: text.id }).then(res => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                        get_directory_file({ resources_id: this.state.changeId }).then(res => {
+                            this.setState({
+                                data: res.data.list,
+                                visible: false,
+                                visible2: false
+                            })
+                        })
+                    }
+                })
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
+    }
+    showRwriteConfirm = (type) => {
+        if (type === 'file') {
+            const params2 = { ...this.state.params2 }
+            edit_file(params2).then(res => {
+                if (res.code === 0) {
+                    message.success(res.message)
+                    get_directory_file({ resources_id: this.state.changeId }).then(res => {
+                        if (res.data.list.length > 0) {
+                            this.setState({
+                                data: res.data.list,
+                                visible: false,
+                                visible2: false
+                            })
+                        }
+                    })
+                }
             })
         } else {
-            console.log('old')
+            const params = { ...this.state.params }
+            if (this.state.title === '新建文件夹') {
+                params.parent_id = this.state.changeId
+                create_directory(params).then(res => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                    }
+                }).then(() => {
+                    get_directory_file({ resources_id: this.state.changeId }).then(res => {
+                        const newArr = res.data.list.concat(res.data.directory_list)
+                        this.setState({
+                            data: newArr,
+                            visible: false,
+                            visible2: false
+                        })
+                    })
+                })
+            } else {
+                edit_directory(params).then(res => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                        get_directory().then(res => {
+                            const newArr = res.data.list.concat(res.data.directory_list)
+                            this.setState({
+                                data: newArr,
+                                visible: false,
+                                visible2: false,
+                                tree:res.data.list
+                            })
+                        })
+                    }
+                })
+            }
         }
     }
-    showRwriteCancel = () => {
+    showRwriteCancel = (type) => {
+        if (type === 'file') {
+            this.setState({
+                visible2: false,
+            })
+            return
+        }
         this.setState({
             visible: false,
         })
     }
     showModal = (e) => {
+        console.log(e)
         //新建及重命名
         if (e.key) {
             this.setState({
                 visible: true,
                 value: '',
                 title: '新建文件夹',
-                titleValue: '请输入新建的文件夹名称'
+                titleValue: '请输入新建的文件夹名称',
+                params: {
+                    parent_id: '',
+                    name: ''
+                }
             })
-            console.log(e)
         } else {
-            console.log(e)
             this.setState({
                 visible: true,
                 value: e,
                 title: '重命名',
-                titleValue: ''
+                titleValue: '',
+                params: {
+                    resources_id: e.id,
+                    parent_id: e.parent_id,
+                    name: e.name
+                }
             })
         }
+    }
+    showModal2 = (e) => {
+        console.log(e)
+        this.setState({
+            visible2: true,
+            params2: {
+                resources_file_id: e.id,
+                file_name: e.file_name || e.name
+            },
+            params: {
+                resources_id: e.id,
+                parent_id: e.parent_id,
+                name: e.name
+            }
+        })
     }
     handleMenuClick = (e) => {
         console.log('click', e);
@@ -186,16 +294,24 @@ class Myresources extends Component {
         }
         return props
     }
-    creatfile = (e) => {
+    creatfile = (e, type) => {
+        const params = { ...this.state.params }
+        const params2 = { ...this.state.params2 }
+        if (type === 'file') {
+            params2.file_name = e.target.value
+            this.setState({
+                params2
+            })
+            return
+        }
+        params.name = e.target.value
         this.setState({
-            value: e.target.value
+            params
         })
     }
     render() {
         const menu = (
             <Menu onClick={this.handleMenuClick}>
-                <Menu.Item key="1">讲义</Menu.Item>
-                <Menu.Item key="2">试卷</Menu.Item>
                 <Menu.Item key="3">文件夹</Menu.Item>
             </Menu>
         );
@@ -209,17 +325,27 @@ class Myresources extends Component {
                     okText="确认"
                     cancelText="取消"
                 >
-                    <Input value={this.state.value} onChange={this.creatfile} placeholder={this.state.titleValue}></Input>
+                    <Input value={this.state.params.name} onChange={this.creatfile} placeholder={this.state.titleValue}></Input>
+                </Modal>
+                <Modal
+                    title='重命名'
+                    visible={this.state.visible2}
+                    onOk={() => this.showRwriteConfirm('file')}
+                    onCancel={() => this.showRwriteCancel('file')}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <Input value={this.state.params2.file_name} onChange={(e) => this.creatfile(e, 'file')} placeholder={this.state.titleValue}></Input>
                 </Modal>
                 <Tabs defaultActiveKey="1" size="Default" onChange={this.onTabClick}>
                     <TabPane tab="文件库" key="1" className="m-tk" >
                         <div style={{ display: 'flex' }}>
-                            <Upload {...this.uoloadUrl()}>
+                            {/* <Upload {...this.uoloadUrl()}>
                                 <Button>
                                     <Icon type="upload" />
                                     上传
                             </Button>
-                            </Upload>
+                            </Upload> */}
                             <div style={{ marginLeft: 10 }}>
                                 <Dropdown overlay={menu}>
                                     <Button>
@@ -228,7 +354,7 @@ class Myresources extends Component {
                                 </Dropdown>
                             </div>
                         </div>
-                        <Tablelink showModal={this.showModal} showDeleteConfirm={this.showDeleteConfirm} actionappear={this.actionappear} l={this.state.l} data={this.state.data} onSelectChange={this.onSelectChange} selectedRowKeys={this.state.selectedRowKeys} searchId={this.searchId}></Tablelink>
+                        <Tablelink showModal={this.showModal} showModal2={this.showModal2} showDeleteConfirm={this.showDeleteConfirm} showDeleteConfirm2={this.showDeleteConfirm2} actionappear={this.actionappear} l={this.state.l} data={this.state.data} onSelectChange={this.onSelectChange} selectedRowKeys={this.state.selectedRowKeys} searchId={this.searchId}></Tablelink>
                     </TabPane>
                     <TabPane tab="我的题目" key="2" >
                     </TabPane>

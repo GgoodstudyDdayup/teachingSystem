@@ -7,6 +7,7 @@ import ZTPreview from '../commont/preview/ztPreview'
 import resourceCenter from '../commont/resourceCenter/recommended/index'
 import StudentMain from '../commont/sutdent/main'
 import StudentLogin from '../commont/sutdent/login'
+import Data from '../commont/data/index'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import React, { Component } from 'react';
 class router extends Component {
@@ -24,6 +25,7 @@ class router extends Component {
                         <Route path="/ztPreview" component={ZTPreview} />
                         <Route path="/studentLogin" component={StudentLogin} />
                         <Route path="/studentMain" component={StudentMain} />
+                        <Route path="/dataImg" component={Data} />
                     </Switch>
                 </div>
             </Router>

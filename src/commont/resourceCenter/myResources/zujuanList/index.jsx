@@ -4,7 +4,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Md5 from 'js-md5'
 import Know from '../../../bk/kejianKnowList'
 import List from '../../../tk/jigouList'
-import { downLoadzujuan, del_self_paper, get_own_subject_list, get_grade_list, get_list, get_self_paper_question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../../../axios/http'
+import {  del_self_paper, get_own_subject_list, get_grade_list, get_list, get_self_paper_question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../../../axios/http'
+// downLoadzujuan,
 const { Option } = Select
 const { TabPane } = Tabs;
 const { confirm } = Modal;

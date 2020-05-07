@@ -555,7 +555,6 @@ const Main = (props) => {
                             </Button>
                         </div>
                         <Button type="primary" onClick={showModal2}>错题录入</Button>
-
                     </div>
                     <div className="m-card" style={height > 638 ? { maxHeight: 600, overflowY: 'scroll', display: 'flex', flexFlow: 'column ' } : { maxHeight: 400, overflowY: 'scroll', display: 'flex', flexFlow: 'column ' }}>
                         {dataList.map(res =>
@@ -664,10 +663,10 @@ const ModalCompent = (props) => {
     useEffect(() => {
         setModalParam({ ...props.modalParams })
     }, [props.modalParams])
-    const teachChange = e => {
-        modalParamResult.analysis_teacher_id = e
-        setModalParam({ ...modalParamResult })
-    }
+    // const teachChange = e => {
+    //     modalParamResult.analysis_teacher_id = e
+    //     setModalParam({ ...modalParamResult })
+    // }
     //modal选择下拉框科目年级时的操作
     const modalChange = (e, res) => {
         modalParamResult[res] = e
@@ -723,12 +722,12 @@ const ModalCompent = (props) => {
                 okText='确认'
                 cancelText='取消'
             >
-                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                {/* <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>老师选择：</span>
                     <Select style={{ width: '100%' }} optionFilterProp="children" showSearch onChange={teachChange} value={modalParamResult.analysis_teacher_id} placeholder="请选择老师">
                         {props.teacherchildren}
                     </Select>
-                </div>
+                </div> */}
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>学科选择：</span>
                     <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_subject_id')} value={modalParamResult.xiaoguanjia_subject_id} placeholder="请选择学科">

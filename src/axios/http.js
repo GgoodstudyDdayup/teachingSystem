@@ -415,11 +415,40 @@ export const remove_wrong_cart = (params) => {
 export const submit_wrong_question_cart = (params) => {
     return instance.post('/api/wrong/submit_wrong_question_cart', params)
 }
+//小亚报表
+export const get_report = (params) => {
+    return instance.post('/api/report/get_index', params)
+}
+//创建我的资源
+export const create_directory = (params) => {
+    return instance.post('/api/resources/create_directory', params)
+}
+//编辑我的资源
+export const edit_directory = (params) => {
+    return instance.post('/api/resources/edit_directory', params)
+}
+//删除我的资源
+export const del_directory = (params) => {
+    return instance.post('/api/resources/del_directory', params)
+}
 
+//获取我的资源
+export const get_directory = (params) => {
+    return instance.get('/api/resources/get_directory', params)
+}
+//获取我的资源文件夹里的资源
+export const get_directory_file = (params) => {
+    return instance.post('/api/resources/get_directory_file', params)
+}
+//修改某个目录下的文件
+export const edit_file = (params) => {
+    return instance.post('/api/resources/edit_file', params)
+}
 
-
-
-
+//删除目录下的文件
+export const del_directory_file = (params) => {
+    return instance.post('/api/resources/del_directory_file', params)
+}
 
 
 

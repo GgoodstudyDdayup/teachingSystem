@@ -824,3 +824,11 @@
   font-weight: 400;
   color: rgba(0, 0, 0, 1);
 }
+
+.data-img {
+  background-image: url('./img/20200430143219.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}

@@ -67,7 +67,6 @@ class bk extends Component {
         const parmas = this.state.parmas
         parmas['starttime'] = time
         parmas['endtime'] = time
-        const count = this.state.totalCount
         paike(parmas).then(res => {
             const list = res.data.list.map((res, index) => {
                 res.key = `${index}`

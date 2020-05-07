@@ -3,6 +3,8 @@ import { Button, Modal, message, Select, Input, Tag } from 'antd'
 import { xiaoguanjia_zuoyeba_list, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_student, create_own_class, get_own_class_list, edit_own_class, del_own_class } from '../../axios/http'
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons'
 const { Option } = Select
+const { confirm } = Modal
+
 class creatnewclass extends Component {
     constructor(props) {
         super(props)
@@ -249,19 +251,32 @@ class creatnewclass extends Component {
         })
     }
     del = (e) => {
-        const params = {...this.state.params}
+        const params = { ...this.state.params }
         del_own_class({ own_class_id: e }).then(res => {
-            if (res.code === 0) {
-                message.success(res.message)
-                get_own_class_list(params).then(res => {
-                    this.setState({
-                        ownClassList: res.data.list
-                    })
-                })
+            confirm({
+                title: '你确定要删除吗',
+                content: ``,
+                okText: '删除',
+                okType: 'danger',
+                cancelText: '取消',
+                onOk: () => {
+                    if (res.code === 0) {
+                        message.success(res.message)
+                        get_own_class_list(params).then(res => {
+                            this.setState({
+                                ownClassList: res.data.list
+                            })
+                        })
 
-            } else {
-                message.error(res.message)
-            }
+                    } else {
+                        message.error(res.message)
+                    }
+                },
+                onCancel() {
+                    console.log('Cancel');
+                },
+            });
+
         })
     }
     render() {
@@ -297,7 +312,7 @@ class creatnewclass extends Component {
                             </div>
                             <div className="m-flex" style={{ marginTop: 10 }}>
                                 <span style={{ display: 'inline-block', width: 50, color: '#9B9BA3' }}>学生：</span>
-                                <span>王老师</span>
+                                <span>{res.student_str}</span>
                             </div>
                             <div className="m-flex" style={{ marginTop: 10 }}>
                                 <span style={{ display: 'inline-block', width: 50, color: '#9B9BA3' }}>信息：</span>

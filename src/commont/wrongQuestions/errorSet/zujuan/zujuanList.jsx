@@ -1,6 +1,5 @@
 import React from 'react';
-import { Divider, Button } from 'antd';
-
+import { Divider } from 'antd';
 // import MathJax from 'simple-react-mathjax'
 import MathJax from 'react-mathjax3'
 const ListT = (props) => {

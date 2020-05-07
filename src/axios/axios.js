@@ -73,8 +73,6 @@ studentInstance.interceptors.response.use(response => {
     message.warning('系统繁忙请稍后重试')
     return Promise.reject(err);
 });
-
-
 companyId.interceptors.request.use(function (config) {
     config.headers['username'] = encodeURI(localStorage.getItem("username"))
     config.headers['token'] = localStorage.getItem("token")
@@ -86,7 +84,7 @@ companyId.interceptors.request.use(function (config) {
 });
 companyId.interceptors.response.use(response => {
     if (response.data.code === '404') {
-        window.location.replace("http://jiaoxue.yanuojiaoyu.com/#/studentLogin");
+        window.location.replace("http://jiaoxue.yanuojiaoyu.com");
     } else {
         NProgress.done()
         return response.data

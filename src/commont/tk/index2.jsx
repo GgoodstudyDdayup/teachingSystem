@@ -201,32 +201,39 @@ class tikuguanli2 extends Component {
         this.handleSize()
     }
     shaixuanName = (...e) => {
+        console.log(e[0])
+        const change = {
+            province_rela_list:e[0].province_rela_list,
+            grade_rela_list:e[0].grade_rela_list,
+            source_rela_list:e[0].source_rela_list,
+            year_rela_list:e[0].year_rela_list
+        }
         const name = []
-        Object.keys(e[0]).forEach(function (key, index) {
+        Object.keys(change).forEach(function (key, index) {
             switch (key) {
                 case 'province_rela_list':
-                    e[0][key].unshift({ province_id: '', name: '不限' })
-                    name.push({ name: '地区', h: 'province_id', list: e[0][key] })
+                    change[key].unshift({ province_id: '', name: '不限' })
+                    name.push({ name: '地区', h: 'province_id', list: change[key] })
                     break
-                case 'difficulty_rela_list':
-                    e[0][key].unshift({ difficulty_id: '', name: '不限' })
-                    name.push({ name: '难度', h: 'difficulty_id', list: e[0][key] })
-                    break
+                // case 'difficulty_rela_list':
+                //     e[0][key].unshift({ difficulty_id: '', name: '不限' })
+                //     name.push({ name: '难度', h: 'difficulty_id', list: e[0][key] })
+                //     break
                 case 'year_rela_list':
-                    e[0][key].unshift({ year: '', name: '不限' })
-                    name.push({ name: '年份', h: 'year', list: e[0][key] })
+                    change[key].unshift({ year: '', name: '不限' })
+                    name.push({ name: '年份', h: 'year', list: change[key] })
                     break
-                case 'ques_type_rela_list':
-                    e[0][key].unshift({ ques_type_id: '', name: '不限' })
-                    name.push({ name: '题型', h: 'ques_type_id', list: e[0][key] })
-                    break
+                // case 'ques_type_rela_list':
+                //     e[0][key].unshift({ ques_type_id: '', name: '不限' })
+                //     name.push({ name: '题型', h: 'ques_type_id', list: e[0][key] })
+                //     break
                 case 'source_rela_list':
-                    e[0][key].unshift({ source_id: '', name: '不限' })
-                    name.push({ name: '来源', h: 'source_id', list: e[0][key] })
+                    change[key].unshift({ source_id: '', name: '不限' })
+                    name.push({ name: '来源', h: 'source_id', list: change[key] })
                     break
                 default:
-                    e[0][key].unshift({ grade_id: '', name: '不限' })
-                    name.push({ name: '年级', h: 'grade_id', list: e[0][key] })
+                    change[key].unshift({ grade_id: '', name: '不限' })
+                    name.push({ name: '年级', h: 'grade_id', list: change[key] })
                     break
             }
         });
