@@ -1,9 +1,39 @@
 import React, { Component } from 'react';
-import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, message } from 'antd';
+import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, message, Breadcrumb, Tree } from 'antd';
 import { create_directory, get_directory, edit_directory, del_directory, get_directory_file, edit_file, del_directory_file } from '../../../../axios/http'
 import Tablelink from './indexlink'
 const { confirm } = Modal;
 const { TabPane } = Tabs;
+const { TreeNode } = Tree
+const treeData = [
+    {
+        title: 'parent 1',
+        key: '0-0',
+        children: [
+            {
+                title: 'parent 1-0',
+                key: '0-0-0',
+                disabled: true,
+                children: [
+                    {
+                        title: 'leaf',
+                        key: '0-0-0-0',
+                        disableCheckbox: true,
+                    },
+                    {
+                        title: 'leaf',
+                        key: '0-0-0-1',
+                    },
+                ],
+            },
+            {
+                title: 'parent 1-1',
+                key: '0-0-1',
+                children: [{ title: <span style={{ color: '#1890ff' }}>sss</span>, key: '0-0-1-0' }],
+            },
+        ],
+    },
+];
 class Myresources extends Component {
     constructor(props) {
         super(props)
@@ -12,6 +42,7 @@ class Myresources extends Component {
             checkAll: false,
             l: '',
             visible: false,
+            visible3:false,
             title: '',
             value: '',
             reWrite: {
@@ -28,6 +59,8 @@ class Myresources extends Component {
             },
             changeId: '',
             selectedRowKeys: [], // Check here to configure the default column
+            Breadcrumb: [],
+            
         }
     }
     onTabClick = (e) => {
@@ -42,11 +75,15 @@ class Myresources extends Component {
     //初始化数据
     componentDidMount() {
         get_directory().then(res => {
+            console.log(res.data.list)
             const newData = res.data.list.reduce((item, res) => {
-                if (res.children) {
-                    delete res.children
+                const ogj = {
+                    id:res.id,
+                    name:res.name,
+                    parent_id:res.parent_id,
+                    type_id:res.type_id
                 }
-                item.push(res)
+                item.push(ogj)
                 return item
             }, [])
             this.setState({
@@ -56,13 +93,17 @@ class Myresources extends Component {
         })
     }
     searchId = (e) => {
+        console.log(e)
+        const Breadcrumb = this.state.Breadcrumb
         get_directory_file({ resources_id: e.id }).then(res => {
+            Breadcrumb.push(e)
             const newArr = res.data.list.concat(res.data.directory_list)
             this.setState({
                 data: newArr,
                 visible: false,
                 visible2: false,
-                changeId: e.id
+                changeId: e.id,
+                Breadcrumb
             })
         })
     }
@@ -198,7 +239,7 @@ class Myresources extends Component {
                                 data: newArr,
                                 visible: false,
                                 visible2: false,
-                                tree:res.data.list
+                                tree: res.data.list
                             })
                         })
                     }
@@ -309,6 +350,65 @@ class Myresources extends Component {
             params
         })
     }
+    tabsplic = (e) => {
+        const Breadcrumb = this.state.Breadcrumb
+        if (e.id === this.state.changeId && Breadcrumb.length > 1) {
+            return
+        } else if (e.id === Breadcrumb[0].id) {
+            get_directory().then(res => {
+                const newData = res.data.list.reduce((item, res) => {
+                    if (res.children) {
+                        delete res.children
+                    }
+                    item.push(res)
+                    return item
+                }, [])
+                this.setState({
+                    data: newData,
+                    tree: res.data.list,
+                    Breadcrumb: []
+                })
+            })
+        } else {
+            get_directory_file({ resources_id: e.id }).then(res => {
+                const newBreadCrumb = Breadcrumb.reduce((item, res, index) => {
+                    if (e.id === res.id) {
+                        item = Breadcrumb.splice(index - 1, Breadcrumb.length - 1)
+                    }
+                    return item
+                }, [])
+                const newArr = res.data.list.concat(res.data.directory_list)
+                this.setState({
+                    data: newArr,
+                    visible: false,
+                    visible2: false,
+                    changeId: e.id,
+                    Breadcrumb: newBreadCrumb
+                })
+            })
+        }
+    }
+    Breadcrumb = (data) => {
+        const arr = data.reduce((item, res, index) => {
+            item.push(
+                <Breadcrumb.Item>
+                    <span className="linkTab" onClick={() => this.tabsplic(res)} key={res}>{res.name}</span>
+                </Breadcrumb.Item>)
+            return item
+        }, [])
+        return (
+            arr
+        )
+    }
+    moveFile = () => {
+
+    }
+    cancleMoveFile = () => {
+
+    }
+    onSelect = e => {
+        console.log(e)
+    }
     render() {
         const menu = (
             <Menu onClick={this.handleMenuClick}>
@@ -337,6 +437,20 @@ class Myresources extends Component {
                 >
                     <Input value={this.state.params2.file_name} onChange={(e) => this.creatfile(e, 'file')} placeholder={this.state.titleValue}></Input>
                 </Modal>
+                <Modal
+                    title='移动文件'
+                    visible={this.state.visible3}
+                    onOk={this.moveFile}
+                    onCancel={this.cancleMoveFile}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <Tree
+                        showLine
+                        onSelect={this.onSelect}
+                        treeData={treeData}
+                    />
+                </Modal>
                 <Tabs defaultActiveKey="1" size="Default" onChange={this.onTabClick}>
                     <TabPane tab="文件库" key="1" className="m-tk" >
                         <div style={{ display: 'flex' }}>
@@ -354,6 +468,9 @@ class Myresources extends Component {
                                 </Dropdown>
                             </div>
                         </div>
+                        <Breadcrumb style={{ marginTop: 10, marginBottom: 10 }} >
+                            {this.Breadcrumb(this.state.Breadcrumb)}
+                        </Breadcrumb>
                         <Tablelink showModal={this.showModal} showModal2={this.showModal2} showDeleteConfirm={this.showDeleteConfirm} showDeleteConfirm2={this.showDeleteConfirm2} actionappear={this.actionappear} l={this.state.l} data={this.state.data} onSelectChange={this.onSelectChange} selectedRowKeys={this.state.selectedRowKeys} searchId={this.searchId}></Tablelink>
                     </TabPane>
                     <TabPane tab="我的题目" key="2" >

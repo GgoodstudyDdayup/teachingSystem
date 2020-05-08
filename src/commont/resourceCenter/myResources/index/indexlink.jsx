@@ -33,7 +33,7 @@ const Tablelink = (props) => {
         {
             title: '文件名',
             align: 'left',
-            key:'wjj',
+            key: 'wjj',
             render: text => (
                 <div className="linkflex" onMouseLeave={() => actionappear(text, false)} onMouseEnter={() => actionappear(text, true)}>
                     <img src={icon(text.name || text.file_name)} alt="" style={{ marginRight: 10 }} />
@@ -44,9 +44,12 @@ const Tablelink = (props) => {
                         <div className="link" onClick={text.type_id === '5' || text.type_id === undefined ? () => props.showModal(text) : () => props.showModal2(text)}>
                             重命名
                         </div>
-                        {/* <div className="link" onClick={() => props.showModal(text)}>
-                            移动
-                        </div> */}
+                        {text.type_id === '5' || text.type_id === undefined ? '' :
+                            <div className="link" onClick={() => props.showModal(text)}>
+                                移动
+                            </div>
+                        }
+
                         <div className="link" onClick={text.type_id === '5' || text.type_id === undefined ? () => props.showDeleteConfirm(text) : () => props.showDeleteConfirm2(text)}>
                             删除
                         </div>

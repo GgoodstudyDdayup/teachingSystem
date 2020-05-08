@@ -28,14 +28,14 @@ const ListT = (props) => {
                     extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
                 }
             }}>
-            <div className="listT" onClick={() => { props.fun(res.question_id) }} >
+            <div className="listT" onClick={() => { props.fun(res.ques_id) }} >
                 <div className="know-name-m" >
                     <span className="know-name">{index + 1 + '、' + res.paper_name}</span>
                     <MathJax.Html html={res.ques_content+res.ques_options} />
                 </div>  
                 <Divider dashed />
                 <Knowlage moveOrAdd={props.moveOrAdd} id={res.ques_id} ques_number={res.ques_number} ques_difficulty_text={res.ques_difficulty_text} index={index} ques_knowledge_name={res.ques_knowledge_name} btn={props.addQuestoin} btn2={props.deleteQuestoin}></Knowlage>
-                <div className={props.appear === res.question_id ? '' : 'question-active'} >
+                <div className={props.appear === res.ques_id ? '' : 'question-active'} >
                     <Divider dashed />
                     <div>
                         <p className="line-shu">答案</p>
