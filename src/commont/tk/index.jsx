@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Tabs, Spin, Badge, Icon, Input, message, BackTop, Pagination } from 'antd';
+import { Tabs, Spin, Badge, Icon, Input, message, BackTop, Pagination, Modal, Tree } from 'antd';
 import Select from './selection'
-import Tree from './tree'
+import TreeA from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { tree, subjectList, tkList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
+import {save_file, get_directory, tree, subjectList, tkList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -28,8 +28,15 @@ class tikuguanli extends Component {
                 key_words: '',
                 is_old: 1,
                 page: 1,
-                page_size:10
+                page_size: 10
             },
+            collectParams: {
+                resources_id: '',
+                file_id: '',
+                file_name: '',
+                type_id: 4
+            },
+            visible3: false,
             totalCount: 1,
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -219,6 +226,22 @@ class tikuguanli extends Component {
         get_ques_ids_cart().then(res => {
             this.setState({
                 cart_ques_ids: res.data.cart_ques_ids
+            })
+        })
+        get_directory().then(res => {
+            //处理tree数据结构
+            const recursion = (data) => {
+                data.forEach(res => {
+                    res['title'] = res.name
+                    res['key'] = res.id
+                    if (res.children) {
+                        recursion(res.children)
+                    }
+                })
+            }
+            recursion(res.data.list)
+            this.setState({
+                treeA: res.data.list
             })
         })
         window.addEventListener('resize', this.handleSize);
@@ -445,10 +468,73 @@ class tikuguanli extends Component {
             })
         })
     };
+    collect = (e, res, id) => {
+        e.stopPropagation()
+        const collectParams = { ...this.state.collectParams }
+        collectParams.file_name = res
+        collectParams.file_id = id
+        this.setState({
+            visible3: true,
+            collectParams
+        })
+        console.log(res, id)
+    }
+    onSelect = e => {
+        //我选择某个文件夹的时候给目录id赋值
+        const collectParams = { ...this.state.collectParams }
+        collectParams.resources_id = e[0]
+        this.setState({
+            collectParams
+        })
+    }
+    moveFile = () => {
+        const collectParams = { ...this.state.collectParams }
+        save_file(collectParams).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                get_directory().then(res => {
+                    //处理tree数据结构
+                    const recursion = (data) => {
+                        data.forEach(res => {
+                            res['title'] = res.name
+                            res['key'] = res.id
+                            if (res.children) {
+                                recursion(res.children)
+                            }
+                        })
+                    }
+                    recursion(res.data.list)
+                    this.setState({
+                        treeA: res.data.list
+                    })
+                })
+            }
+            this.setState({
+                visible3: false
+            })
+        })
+    }
+    cancleMoveFile = () => {
+        this.setState({
+            visible3: false
+        })
+    }
     render() {
         return (
             <div>
-
+                <Modal
+                    title='移动文件'
+                    visible={this.state.visible3}
+                    onOk={this.moveFile}
+                    onCancel={this.cancleMoveFile}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <Tree
+                        onSelect={this.onSelect}
+                        treeData={this.state.treeA}
+                    />
+                </Modal>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
                 <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
@@ -488,13 +574,13 @@ class tikuguanli extends Component {
                         <div>
                             <div className="knowlage">
                                 <div className="tree" style={this.state.height > 638 ? { maxHeight: 600, overflowY: 'scroll', width: 370 } : { maxHeight: 400, overflowY: 'scroll', width: 370 }}>
-                                    <Tree data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValue={this.state.params.key_words}></Tree>
+                                    <TreeA data={this.state.tree} funt={this.changeaitifen_id} search={this.searchKnowLage} knowLageValue={this.state.params.key_words}></TreeA>
                                 </div>
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600 } : { height: 400 }}>
                                     <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                     <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton />
                                     {/* <div className="m-scroll-list"> */}
-                                    <List data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
+                                    <List collect={this.collect} data={this.state.list} fun={this.add} deleteQuestoin={this.deleteQuestoin} appear={this.state.appear} addQuestoin={this.addQuestoin} moveOrAdd={this.moveOrAdd}>
                                     </List>
                                     <BackTop target={() => document.getElementById('scroll-y')} />
                                     {/* </div> */}

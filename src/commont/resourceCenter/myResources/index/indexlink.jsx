@@ -1,30 +1,38 @@
 import React from 'react';
 import { Table } from 'antd';
-
-
+import { get_questioninfo, get_paper_info } from '../../../../axios/http'
 //此组件父组件负责数据，子组件负责数据操作及异步操作
 const Tablelink = (props) => {
     const linkWenjian = (e) => {
+        if (e.type_id === '2') {
+            get_paper_info({ paper_id: e.file_id }).then(res => {
+                localStorage.setItem('previewData', JSON.stringify(res.data.ques_list))
+                window.open('/#/ztPreview')
+            })
+            return
+        }
+        if (e.type_id === '4') {
+            get_questioninfo({ ques_id: e.file_id }).then(res => {
+                props.questionInfo(res.data.model)
+            })
+            return
+        }
         props.searchId(e)
     }
     //通过文件名来判断渲染哪一个icon图标
-    const icon = (text) => {
-        const l1 = props.data.reduce((item, res) => {
-            if (res.name || res.file_name === text) {
-                switch (res.type_id) {
-                    case '1':
-                        item = require('../../../../img/iconjiangyi.png')
-                        break
-                    case '2':
-                        item = require('../../../../img/iconshijuan.png')
-                        break
-                    default:
-                        item = require('../../../../img/iconwenjianjia.png')
-                }
-            }
-            return item
-        }, [])
-        return l1
+    const icon = (type_id) => {
+        let item = ''
+        switch (type_id) {
+            case '4':
+                item = require('../../../../img/iconshijuan.png')
+                break
+            case '2':
+                item = require('../../../../img/iconjiangyi.png')
+                break
+            default:
+                item = require('../../../../img/iconwenjianjia.png')
+        }
+        return item
     }
     const actionappear = (value, key) => {
         props.actionappear(value, key)
@@ -36,7 +44,7 @@ const Tablelink = (props) => {
             key: 'wjj',
             render: text => (
                 <div className="linkflex" onMouseLeave={() => actionappear(text, false)} onMouseEnter={() => actionappear(text, true)}>
-                    <img src={icon(text.name || text.file_name)} alt="" style={{ marginRight: 10 }} />
+                    <img src={icon(text.type_id)} alt="" style={{ marginRight: 10 }} />
                     <div className="link" onClick={() => linkWenjian(text)}>
                         {text.name || text.file_name}
                     </div>
@@ -45,11 +53,10 @@ const Tablelink = (props) => {
                             重命名
                         </div>
                         {text.type_id === '5' || text.type_id === undefined ? '' :
-                            <div className="link" onClick={() => props.showModal(text)}>
+                            <div className="link" onClick={() => props.fileMove(text)}>
                                 移动
                             </div>
                         }
-
                         <div className="link" onClick={text.type_id === '5' || text.type_id === undefined ? () => props.showDeleteConfirm(text) : () => props.showDeleteConfirm2(text)}>
                             删除
                         </div>

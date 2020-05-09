@@ -28,7 +28,7 @@ const ListT = (props) => {
                     extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
                 }
             }}>
-            <div className="listT" onClick={() => { props.fun(res.question_id) }} >
+            <div className="listT" onClick={() => { props.fun(res.ques_id) }} >
                 <div className="know-name-m" >
                     <span className="know-name">{index + 1 + '、' + res.paper_name}</span>
                     <MathJax.Html html={res.ques_content+res.ques_options} />

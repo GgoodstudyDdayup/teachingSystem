@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  List, Avatar, Pagination } from 'antd';
+import { List, Avatar, Pagination } from 'antd';
 import { ztshijuan } from '../../axios/http'
 // Input,
 // const { Search } = Input;
@@ -23,7 +23,7 @@ const Knowlage = (props) => {
         })
     }, [props])
     return (
-        <div style={{width:270}}>
+        <div style={{ width: 270 }}>
             {/* <Search
                 placeholder="搜索真题试卷"
                 onSearch={value => console.log(value)}
@@ -38,7 +38,7 @@ const Knowlage = (props) => {
                     size='small'
                     renderItem={item => (
                         <List.Item
-                            onClick={() => props.listView(item.aitifen_id,count)}
+                            onClick={() => props.listView(item.aitifen_id, item.show_name,count)}
                         >
                             <List.Item.Meta
                                 avatar={<Avatar src={require('../../img/shijuan.png')} />}

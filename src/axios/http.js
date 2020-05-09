@@ -449,6 +449,10 @@ export const edit_file = (params) => {
 export const del_directory_file = (params) => {
     return instance.post('/api/resources/del_directory_file', params)
 }
+//收藏接口
+export const save_file = (params) => {
+    return instance.post('/api/resources/save_file', params)
+}
 
 
 

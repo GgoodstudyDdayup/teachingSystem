@@ -112,6 +112,7 @@ export default class EditorDemo extends React.Component {
                     saveParams.ques_year = res.data.model.ques_year
                     this.tableChange(res.data.model.ques_options)
                     this.switchState(params.template_id, params)
+                    console.log(this.props.location.state)
                     let newSelectArray = [this.props.location.state.sbjArray[0].split('')[0] + this.props.location.state.sbjArray[0].split('')[1], this.props.location.state.sbjArray[1]]
                     const know_lageNameList = res.data.question_tree_rela_list.map(res => {
                         return res.title

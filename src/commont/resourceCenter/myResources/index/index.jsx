@@ -1,39 +1,10 @@
 import React, { Component } from 'react';
-import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, message, Breadcrumb, Tree } from 'antd';
+import { Tabs, Button, Menu, Dropdown, Icon, Modal, Input, message, Breadcrumb, Tree, Divider } from 'antd';
 import { create_directory, get_directory, edit_directory, del_directory, get_directory_file, edit_file, del_directory_file } from '../../../../axios/http'
 import Tablelink from './indexlink'
+import MathJax from 'react-mathjax3'
 const { confirm } = Modal;
 const { TabPane } = Tabs;
-const { TreeNode } = Tree
-const treeData = [
-    {
-        title: 'parent 1',
-        key: '0-0',
-        children: [
-            {
-                title: 'parent 1-0',
-                key: '0-0-0',
-                disabled: true,
-                children: [
-                    {
-                        title: 'leaf',
-                        key: '0-0-0-0',
-                        disableCheckbox: true,
-                    },
-                    {
-                        title: 'leaf',
-                        key: '0-0-0-1',
-                    },
-                ],
-            },
-            {
-                title: 'parent 1-1',
-                key: '0-0-1',
-                children: [{ title: <span style={{ color: '#1890ff' }}>sss</span>, key: '0-0-1-0' }],
-            },
-        ],
-    },
-];
 class Myresources extends Component {
     constructor(props) {
         super(props)
@@ -42,7 +13,9 @@ class Myresources extends Component {
             checkAll: false,
             l: '',
             visible: false,
-            visible3:false,
+            visible3: false,
+            visible4: false,
+            ques_list: '',
             title: '',
             value: '',
             reWrite: {
@@ -57,10 +30,16 @@ class Myresources extends Component {
                 resources_file_id: '',
                 file_name: '',
             },
+            params3: {
+                resources_file_id: '',
+                file_name: '',
+                resources_id: ''
+            },
             changeId: '',
             selectedRowKeys: [], // Check here to configure the default column
             Breadcrumb: [],
-            
+            tree: []
+
         }
     }
     onTabClick = (e) => {
@@ -75,13 +54,24 @@ class Myresources extends Component {
     //初始化数据
     componentDidMount() {
         get_directory().then(res => {
-            console.log(res.data.list)
+            //处理tree数据结构
+            const recursion = (data) => {
+                data.forEach(res => {
+                    res['title'] = res.name
+                    res['key'] = res.id
+                    if (res.children) {
+                        recursion(res.children)
+                    }
+                })
+            }
+            recursion(res.data.list)
+            //处理列表数据
             const newData = res.data.list.reduce((item, res) => {
                 const ogj = {
-                    id:res.id,
-                    name:res.name,
-                    parent_id:res.parent_id,
-                    type_id:res.type_id
+                    id: res.id,
+                    name: res.name,
+                    parent_id: res.parent_id,
+                    type_id: res.type_id
                 }
                 item.push(ogj)
                 return item
@@ -92,6 +82,7 @@ class Myresources extends Component {
             })
         })
     }
+
     searchId = (e) => {
         console.log(e)
         const Breadcrumb = this.state.Breadcrumb
@@ -147,6 +138,16 @@ class Myresources extends Component {
                     if (res.code === 0) {
                         message.success(res.message)
                         get_directory().then(res => {
+                            const recursion = (data) => {
+                                data.forEach(res => {
+                                    res['title'] = res.name
+                                    res['key'] = res.id
+                                    if (res.children) {
+                                        recursion(res.children)
+                                    }
+                                })
+                            }
+                            recursion(res.data.list)
                             const newData = res.data.list.reduce((item, res) => {
                                 if (res.children) {
                                     delete res.children
@@ -157,7 +158,8 @@ class Myresources extends Component {
                             this.setState({
                                 data: newData,
                                 tree: res.data.list,
-                                visible: false
+                                visible: false,
+                                Breadcrumb: []
                             })
                         })
                     }
@@ -180,8 +182,9 @@ class Myresources extends Component {
                     if (res.code === 0) {
                         message.success(res.message)
                         get_directory_file({ resources_id: this.state.changeId }).then(res => {
+                            const newArr = res.data.list.concat(res.data.directory_list)
                             this.setState({
-                                data: res.data.list,
+                                data: newArr,
                                 visible: false,
                                 visible2: false
                             })
@@ -202,8 +205,9 @@ class Myresources extends Component {
                     message.success(res.message)
                     get_directory_file({ resources_id: this.state.changeId }).then(res => {
                         if (res.data.list.length > 0) {
+                            const newArr = res.data.list.concat(res.data.directory_list)
                             this.setState({
-                                data: res.data.list,
+                                data: newArr,
                                 visible: false,
                                 visible2: false
                             })
@@ -234,6 +238,16 @@ class Myresources extends Component {
                     if (res.code === 0) {
                         message.success(res.message)
                         get_directory().then(res => {
+                            const recursion = (data) => {
+                                data.forEach(res => {
+                                    res['title'] = res.name
+                                    res['key'] = res.id
+                                    if (res.children) {
+                                        recursion(res.children)
+                                    }
+                                })
+                            }
+                            recursion(res.data.list)
                             const newArr = res.data.list.concat(res.data.directory_list)
                             this.setState({
                                 data: newArr,
@@ -353,9 +367,26 @@ class Myresources extends Component {
     tabsplic = (e) => {
         const Breadcrumb = this.state.Breadcrumb
         if (e.id === this.state.changeId && Breadcrumb.length > 1) {
+            get_directory_file({ resources_id: e.id }).then(res => {
+                const newArr = res.data.list.concat(res.data.directory_list)
+                this.setState({
+                    data: newArr,
+                    changeId: e.id
+                })
+            })
             return
         } else if (e.id === Breadcrumb[0].id) {
             get_directory().then(res => {
+                const recursion = (data) => {
+                    data.forEach(res => {
+                        res['title'] = res.name
+                        res['key'] = res.id
+                        if (res.children) {
+                            recursion(res.children)
+                        }
+                    })
+                }
+                recursion(res.data.list)
                 const newData = res.data.list.reduce((item, res) => {
                     if (res.children) {
                         delete res.children
@@ -400,15 +431,151 @@ class Myresources extends Component {
             arr
         )
     }
+    fileMove = (res) => {
+        const params3 = { ...this.state.params3 }
+        params3.resources_file_id = res.id
+        params3.file_name = res.file_name
+        this.setState({
+            visible3: true,
+            params3
+        })
+    }
     moveFile = () => {
-
+        const params3 = { ...this.state.params3 }
+        edit_file(params3).then(res => {
+            if (res.code === 0) {
+                message.success(res.message)
+                if (this.state.Breadcrumb.length > 0) {
+                    get_directory_file({ resources_id: this.state.changeId }).then(res => {
+                        const newArr = res.data.list.concat(res.data.directory_list)
+                        this.setState({
+                            data: newArr,
+                        })
+                    })
+                } else {
+                    get_directory().then(res => {
+                        //处理tree数据结构
+                        const recursion = (data) => {
+                            data.forEach(res => {
+                                res['title'] = res.name
+                                res['key'] = res.id
+                                if (res.children) {
+                                    recursion(res.children)
+                                }
+                            })
+                        }
+                        recursion(res.data.list)
+                        //处理列表数据
+                        const newData = res.data.list.reduce((item, res) => {
+                            const ogj = {
+                                id: res.id,
+                                name: res.name,
+                                parent_id: res.parent_id,
+                                type_id: res.type_id
+                            }
+                            item.push(ogj)
+                            return item
+                        }, [])
+                        this.setState({
+                            data: newData,
+                            tree: res.data.list
+                        })
+                    })
+                }
+                this.setState({
+                    visible3: false
+                })
+            }
+        })
     }
     cancleMoveFile = () => {
-
+        this.setState({
+            visible3: false
+        })
     }
     onSelect = e => {
-        console.log(e)
+        //我选择某个文件夹的时候给目录id赋值
+        const params3 = { ...this.state.params3 }
+        params3.resources_id = e[0]
+        this.setState({
+            params3
+        })
     }
+    questionInfo = (res) => {
+        console.log(res)
+        const ques_list = (
+            <MathJax.Context
+                input='tex'
+                onError={(MathJax, error) => {
+                    console.warn(error);
+                    console.log("Encountered a MathJax error, re-attempting a typeset!");
+                    MathJax.Hub.Queue(
+                        MathJax.Hub.Typeset()
+                    );
+                }}
+                script="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js"
+                options={{
+                    messageStyle: 'none',
+                    extensions: ['tex2jax.js'],
+                    jax: ['input/TeX', 'output/HTML-CSS'],
+                    tex2jax: {
+                        inlineMath: [['$', '$'], ['\\(', '\\)']],
+                        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                        processEscapes: true,
+                    },
+                    TeX: {
+                        extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js']
+                    }
+                }}>
+                <div className="listT" >
+                    <div className="know-name-m" >
+                        <span className="know-name">{res.paper_name}</span>
+                        <MathJax.Html html={res.ques_content + res.ques_options} />
+                        <div  >
+                            <Divider dashed />
+                            <div>
+                                <p className="line-shu">答案</p>
+                                <MathJax.Html html={res.ques_answer} />
+
+                            </div>
+                            <div>
+                                <p className="line-shu">解析</p>
+                                <MathJax.Html html={res.ques_analysis} />
+                            </div>
+                        </div>
+                    </div>
+                    <Divider dashed />
+                    <div className="shop-btn">
+                        <div className="know-title-div">
+                            <p className="know-title">
+                                知识点:
+            <span>{res.ques_knowledge_name}</span>
+                            </p>
+                            <p className="know-title">
+                                难度:
+            <span>{res.ques_difficulty_text}</span>
+                            </p>
+                            <p className="know-title">
+                                组卷:
+            <span>{res.ques_number}次</span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </MathJax.Context>
+        )
+        this.setState({
+            ques_list,
+            visible4: true
+        })
+    }
+    ques_list = () => {
+        this.setState({
+            visible4: false
+        })
+    }
+    
     render() {
         const menu = (
             <Menu onClick={this.handleMenuClick}>
@@ -446,11 +613,22 @@ class Myresources extends Component {
                     cancelText="取消"
                 >
                     <Tree
-                        showLine
                         onSelect={this.onSelect}
-                        treeData={treeData}
+                        treeData={this.state.tree}
                     />
                 </Modal>
+                <Modal
+                    title='我的试题'
+                    visible={this.state.visible4}
+                    onOk={this.ques_list}
+                    onCancel={this.ques_list}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    {this.state.ques_list}
+                </Modal>
+                
+
                 <Tabs defaultActiveKey="1" size="Default" onChange={this.onTabClick}>
                     <TabPane tab="文件库" key="1" className="m-tk" >
                         <div style={{ display: 'flex' }}>
@@ -471,7 +649,7 @@ class Myresources extends Component {
                         <Breadcrumb style={{ marginTop: 10, marginBottom: 10 }} >
                             {this.Breadcrumb(this.state.Breadcrumb)}
                         </Breadcrumb>
-                        <Tablelink showModal={this.showModal} showModal2={this.showModal2} showDeleteConfirm={this.showDeleteConfirm} showDeleteConfirm2={this.showDeleteConfirm2} actionappear={this.actionappear} l={this.state.l} data={this.state.data} onSelectChange={this.onSelectChange} selectedRowKeys={this.state.selectedRowKeys} searchId={this.searchId}></Tablelink>
+                        <Tablelink questionInfo={this.questionInfo} fileMove={this.fileMove} showModal={this.showModal} showModal2={this.showModal2} showDeleteConfirm={this.showDeleteConfirm} showDeleteConfirm2={this.showDeleteConfirm2} actionappear={this.actionappear} l={this.state.l} data={this.state.data} onSelectChange={this.onSelectChange} selectedRowKeys={this.state.selectedRowKeys} searchId={this.searchId}></Tablelink>
                     </TabPane>
                     <TabPane tab="我的题目" key="2" >
                     </TabPane>
