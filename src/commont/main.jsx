@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined } from '@ant-design/icons'
-// , RadarChartOutlined, ContainerOutlined
+import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined, PieChartOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -32,6 +31,7 @@ import ExerciseBookInfo from './wrongQuestions/exerciseBook/info'
 import ReportForm from './wrongQuestions/reportForm/index'
 import CreatNewClass from './quanxian/creatnewclass'
 import ZujuanError from '../commont/wrongQuestions/errorSet/zujuan/zujuan'
+import StudentMine from '../commont/myStudent'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
@@ -147,7 +147,7 @@ class main extends Component {
             })
         }
     }
-    dataImg = ()=>{
+    dataImg = () => {
         window.open('http://zt.zhongxiaoxue.cn/node/build/#/dataImg')
     }
     render() {
@@ -217,7 +217,7 @@ class main extends Component {
                                 <Link to="/main/bk/kejian">组卷审核</Link>
                             </Menu.Item>}
                         </SubMenu>
-                        {/* <SubMenu
+                        <SubMenu
                             key="sub22"
                             title={
                                 <span>
@@ -232,13 +232,13 @@ class main extends Component {
                             <Menu.Item key="225">
                                 <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
                             </Menu.Item>
-                        </SubMenu> */}
-                        {/* <Menu.Item key="227">
+                        </SubMenu>
+                        <Menu.Item key="227">
                             <ContainerOutlined />
                             <span>电子练习册
                             </span>
                             <Link to='/main/wrongQuestion/exerciseBook'></Link>
-                        </Menu.Item> */}
+                        </Menu.Item>
                         {/* <Menu.Item key="228" onClick={this.dataImg}>
                             <ContainerOutlined />
                             <span>REP学员数据报表
@@ -295,6 +295,11 @@ class main extends Component {
                             }
                         >
                         </SubMenu> */}
+                        <Menu.Item key="228">
+                            <PieChartOutlined />
+                            <span>我的学员</span>
+                            <Link to="/main/StudentMine">推荐资源</Link>
+                        </Menu.Item>
                         <SubMenu
                             key="sub6"
                             title={
@@ -399,7 +404,7 @@ class main extends Component {
                             background: '#fff',
                             minHeight: 280,
                         }}
-                        className={this.props.location.pathname === '/main/zujuan' || this.props.location.pathname === '/main/wrongQuestion/reportForm'||this.props.location.pathname === '/main/wrongQuestion/errorSet/zujuan' ? 'conntent-none' : ''}
+                        className={this.props.location.pathname === '/main/zujuan' || this.props.location.pathname === '/main/wrongQuestion/reportForm' || this.props.location.pathname === '/main/wrongQuestion/errorSet/zujuan' ? 'conntent-none' : ''}
                     >
                         <Switch>
                             {/* 题库管理 */}
@@ -432,9 +437,11 @@ class main extends Component {
                             <Route path="/main/wrongQuestion/errorSet" exact component={ErrorSet} />
                             <Route path="/main/wrongQuestion/exerciseBook" exact component={ExerciseBook} />
                             <Route path="/main/wrongQuestion/exerciseBook/info" component={ExerciseBookInfo} />
+                            {/* 我的学员 */}
+                            <Route path="/main/StudentMine" component={StudentMine} />
+                            
 
-                            
-                            
+
                             <Route path="/main/zy" component={ZY} />
                             <Route path="/main/cp" component={CP} />
                         </Switch>

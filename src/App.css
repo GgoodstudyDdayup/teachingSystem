@@ -481,7 +481,14 @@
 .linkTab:hover {
   color: #1890ff;
 }
+.linkTab2 {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
+.linkTab2:hover {
+  color: #1890ff;
+}
 .m-left {
   margin-left: 10px;
 }

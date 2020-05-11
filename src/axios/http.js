@@ -453,8 +453,22 @@ export const del_directory_file = (params) => {
 export const save_file = (params) => {
     return instance.post('/api/resources/save_file', params)
 }
-
-
+//获取备课文件
+export const get_course_file = (params) => {
+    return instance.post('/api/self_lecture/get_course_file', params)
+}
+//获取老师底下的学生
+export const get_student_by_teacher = (params) => {
+    return instance.post('/api/wrong/get_student_by_teacher', params)
+}
+//获取老师底下的学生的错题集
+export const get_recommend_collect = (params) => {
+    return instance.post('/api/wrong/get_recommend_collect', params)
+}
+//获取老师底下的学生的错题集对应错题
+export const get_recommend_collect_question = (params) => {
+    return instance.post('/api/wrong/get_recommend_collect_question', params)
+}
 
 //获取学生登录后错题列表
 export const get_user_wrong_question = (params) => {

@@ -72,6 +72,7 @@ class creatnewclass extends Component {
                 ownClassList: res.data.list
             })
         })
+
     }
     showModal = () => {
         this.setState({

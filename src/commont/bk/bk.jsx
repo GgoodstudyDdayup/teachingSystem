@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Button, DatePicker, Modal, Upload, Input, Checkbox, Pagination, message, Tag, Select } from 'antd';
 import locale from 'antd/es/date-picker/locale/zh_CN'
-import { paike, zidingyikejian, kechendizhi } from '../../axios/http'
+import { paike, zidingyikejian, kechendizhi, get_course_file } from '../../axios/http'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 moment.locale('zh-cn')
@@ -44,7 +44,7 @@ class bk extends Component {
                 course_url: ''
             },
             totalCount: 100,
-            count:this.totalCount,
+            count: this.totalCount,
             obj: {
                 has_zhishijingjiang: '知识精讲',
                 has_sandianpouxi: '三点剖析',
@@ -56,7 +56,7 @@ class bk extends Component {
             fileList: [],
             checkList: [],
             visible: false,
-            
+
             data: [
             ]
         }
@@ -77,7 +77,7 @@ class bk extends Component {
                 totalCount: Number(res.data.total_count),
                 time,
                 parmas,
-                count:Number(res.data.total_count)
+                count: Number(res.data.total_count)
             })
         })
     }
@@ -272,7 +272,7 @@ class bk extends Component {
             this.setState({
                 data: list,
                 totalCount: Number(res.data.total_count),
-                count:Number(res.data.total_count),
+                count: Number(res.data.total_count),
                 parmas
             })
         })
@@ -312,8 +312,8 @@ class bk extends Component {
         parmas.page_size = e
         this.setState({
             parmas,
-            count:Math.ceil(Number(count)/Number(e)*10)
-            
+            count: Math.ceil(Number(count) / Number(e) * 10)
+
         })
     }
     numberonChange = e => {
@@ -321,6 +321,19 @@ class bk extends Component {
         parmas.page = e.target.value
         this.setState({
             parmas
+        })
+    }
+    catchFile = e => {
+        get_course_file({ course_id: e.course_id }).then(res => {
+            console.log(res)
+            if (res.code === 0 && res.data.model !== null) {
+                res.data.model.file.split(',').forEach(res => {
+                    if (res === 'undefined') {
+                        return false
+                    }
+                    window.open(res)
+                })
+            }
         })
     }
     render() {
@@ -355,12 +368,11 @@ class bk extends Component {
             },
             {
                 title: '是否备课',
-                dataIndex: 'is_beike',
                 key: 'is_beike',
                 sorter: (a, b) => a.is_beike - b.is_beike,
                 render: (text) => (
                     <span>
-                        {text === '1' ? '已备课' : '未备课'}
+                        {text.is_beike === '1' ? <span className="linkTab2" onClick={() => this.catchFile(text)}>已备课</span> : '未备课'}
                     </span>
                 ),
             },
