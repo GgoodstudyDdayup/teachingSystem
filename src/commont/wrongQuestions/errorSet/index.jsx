@@ -5,7 +5,7 @@ import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
 import ImgCrop from 'antd-img-crop';
 import Finished from './finished'
-import { edit_wrong_question, analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student, loginUserList, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
+import { getStudent_by_teacher, get_grade_by_teacher, edit_wrong_question, analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
 const { TabPane } = Tabs
 const { Option } = Select
 const { confirm } = Modal
@@ -24,9 +24,9 @@ const Main = (props) => {
     }
     //录入
     const modalParams = {
-        xiaoguanjia_subject_id: [],
+        // xiaoguanjia_subject_id: [],
         xiaoguanjia_grade_id: [],
-        xiaoguanjia_class_id: [],
+        // xiaoguanjia_class_id: [],
         xiaoguanjia_student_ids: [],
         analysis_teacher_id: [],
         image: '',
@@ -57,7 +57,7 @@ const Main = (props) => {
     const [subjectchildren, setSubjectchildren] = useState('')
     const [gradechildren, setGradechildren] = useState('')
     const [classchildren, setClasschildren] = useState('')
-    const [teacherchildren, setTeacherchildren] = useState('')
+    // const [teacherchildren, setTeacherchildren] = useState('')
     const [height, setHeight] = useState('')
     const [visible2, setVisible2] = useState(false)
     const [visible3, setVisible3] = useState(false)
@@ -72,7 +72,9 @@ const Main = (props) => {
     const [zjList, setZjList] = useState([])
     const [zjChildrenList, setZjChildrenList] = useState([])
     const [knowlageList, setKnowlageList] = useState([])
+
     const [countNumber, setCount] = useState(0)
+
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
 
     useEffect(() => {
@@ -107,17 +109,19 @@ const Main = (props) => {
             })
             setGradechildren([...gradechildren])
         })
-        loginUserList({
-            name: '',
-            username: '',
-            permission: '',
-            page_size: 100,
-        }).then(res => {
-            const teachChildren = res.data.list.map(res => {
-                return <Option key={res.id} value={res.id} >{res.name}</Option>
-            })
-            setTeacherchildren([...teachChildren])
-        })
+        // loginUserList({
+        //     name: '',
+        //     username: '',
+        //     permission: '',
+        //     page_size: 100,
+        // }).then(res => {
+        //     console.log(res)
+        //     const teachChildren = res.data.list.map(res => {
+        //         return <Option key={res.id} value={res.id} >{res.name}</Option>
+        //     })
+        //     setTeacherchildren([...teachChildren])
+        // })
+
     }, [])
     const handleChange = (editorState) => {
         drawerParamResult.analysis_content = editorState.toHTML()
@@ -138,7 +142,7 @@ const Main = (props) => {
         }
     }
     const prop = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
         onChange: handleChange2,
         multiple: true,
         name: 'upload_control',
@@ -206,7 +210,7 @@ const Main = (props) => {
             }
         })
     }
-    const detail = (id, image, text) => {
+    const detail = (id, image, text, res) => {
         drawerParamResult['id'] = id
         setDrawerParam({ ...drawerParamResult })
         // setDrawerImage(image)
@@ -225,7 +229,7 @@ const Main = (props) => {
                 const source = res.data.source_list.map((res, index) => {
                     return <Option key={res.name} value={res.id} >{res.name}</Option>
                 })
-                
+
                 setPubilcZjList(res.data.course_section_list)
                 setTixingOptions([...tixingOptions])
                 setSourceOptions([...source])
@@ -341,7 +345,6 @@ const Main = (props) => {
         });
 
     }
-
     const drawerChange = (e, res) => {
         drawerParamResult[res] = e
         setDrawerParam({ ...drawerParamResult })
@@ -380,10 +383,10 @@ const Main = (props) => {
         setCount(e)
     }
     const bianji = (id, res) => {
-        console.log(id, res)
+        modalParamResult.id = id
         modalParamResult.xiaoguanjia_subject_id = res.xiaoguanjia_subject_id
         modalParamResult.xiaoguanjia_grade_id = res.xiaoguanjia_grade_id
-        modalParamResult.xiaoguanjia_class_id = res.xiaoguanjia_class_id
+        // modalParamResult.xiaoguanjia_class_id = res.xiaoguanjia_class_id
         modalParamResult.xiaoguanjia_student_ids = res.xiaoguanjia_student_ids.split(',')
         modalParamResult.analysis_teacher_id = res.analysis_teacher_id
         modalParamResult.text = res.text
@@ -391,11 +394,11 @@ const Main = (props) => {
         setModalParam({ ...modalParamResult })
     }
     const eidtorOk = params => {
-        const studentString = params.xiaoguanjia_student_ids.reduce((item, res) => {
-            item += res + ','
-            return item
-        }, '')
-        params.xiaoguanjia_student_ids = studentString
+        // const studentString = params.xiaoguanjia_student_ids.reduce((item, res) => {
+        //     item += res + ','
+        //     return item
+        // }, '')
+        // params.xiaoguanjia_student_ids = studentString
         edit_wrong_question(params).then(res => {
             if (res.code === 0) {
                 message.success(res.message)
@@ -525,11 +528,10 @@ const Main = (props) => {
                     <Button type="primary" onClick={ok}>确认</Button>
                 </div>
             </Drawer>
-            <ModalCompent modalParams={modalParamResult} modalCancel={modalCancel} modalOk={modalOk} visible2={visible2} teacherchildren={teacherchildren} subjectchildren={subjectchildren} gradechildren={gradechildren} />
-            <EditorModalCompent modalParams={modalParamResult} modalCancel={editormodalCancel} modalOk={eidtorOk} visible2={visible3} teacherchildren={teacherchildren} subjectchildren={subjectchildren} gradechildren={gradechildren}></EditorModalCompent>
+            <ModalCompent modalParams={modalParamResult} modalCancel={modalCancel} modalOk={modalOk} visible2={visible2} subjectchildren={subjectchildren} gradechildren={gradechildren} />
+            <EditorModalCompent modalParams={modalParamResult} modalCancel={editormodalCancel} modalOk={eidtorOk} visible2={visible3} subjectchildren={subjectchildren} gradechildren={gradechildren}></EditorModalCompent>
             <Tabs defaultActiveKey='1' onChange={tabchangeCount}>
                 <TabPane tab="未完成" key="1">
-
                     <div className="m-bottom m-flex" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
                         <div className="m-flex">
                             <div >
@@ -599,8 +601,10 @@ const ModalCompent = (props) => {
     const modalParams = props.modalParams
     modalParams.text = BraftEditor.createEditorState(props.modalParams.text || null)
     const [modalParamResult, setModalParam] = useState(modalParams)
-    const [classchildren, setClasschildren] = useState([])
-    const [studentchildren, setStudentchildren] = useState([])
+    const [grandchildren, setgrandchildren] = useState([])
+    const [studentchildren, setstudentchildren] = useState([])
+    // const [classchildren, setClasschildren] = useState([])
+    // const [studentchildren, setStudentchildren] = useState([])
     const [text, setText] = useState('')
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
     const addimg = e => {
@@ -616,7 +620,7 @@ const ModalCompent = (props) => {
         }
     }
     const props2 = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
         onChange: addimg,
         multiple: true,
         name: 'upload_control',
@@ -663,6 +667,28 @@ const ModalCompent = (props) => {
     useEffect(() => {
         setModalParam({ ...props.modalParams })
     }, [props.modalParams])
+    useEffect(() => {
+        getStudent_by_teacher({ teacher_employee_id: '', grade_id: '' }).then(res => {
+            console.log(res)
+            const zuoyebalist = res.data.zuoyeba_list.map(res => {
+                if (res.name) {
+                    res.name += '(作业吧)'
+                }
+                return res
+            })
+            const result = zuoyebalist.concat(res.data.list)
+            const studentchildren = result.map(l1 => {
+                return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+            })
+            setstudentchildren(studentchildren)
+        })
+        get_grade_by_teacher({ teacher_employee_id: '' }).then(res => {
+            const grandchildren = res.data.list.map(l1 => {
+                return <Option key={l1.grade_id} value={l1.grade_id} >{l1.grade}</Option>
+            })
+            setgrandchildren(grandchildren)
+        })
+    }, [])
     // const teachChange = e => {
     //     modalParamResult.analysis_teacher_id = e
     //     setModalParam({ ...modalParamResult })
@@ -670,27 +696,33 @@ const ModalCompent = (props) => {
     //modal选择下拉框科目年级时的操作
     const modalChange = (e, res) => {
         modalParamResult[res] = e
-        if (typeof modalParamResult.xiaoguanjia_subject_id !== 'object' && typeof modalParamResult.xiaoguanjia_grade_id !== 'object') {
-            get_xiaoguanjia_class(modalParamResult).then(res => {
-                const classchildren = res.data.list.map(l1 => {
-                    return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
-                })
-                setClasschildren([...classchildren])
-            })
-        }
-        setModalParam({ ...modalParamResult })
-    }
-    //modal选择下拉框班级时的操作
-    const modalclassChange = e => {
-        get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
+        getStudent_by_teacher({ teacher_employee_id: '', grade_id: e }).then(res => {
             const studentchildren = res.data.list.map(l1 => {
                 return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
             })
-            modalParamResult.xiaoguanjia_class_id = e
-            setModalParam({ ...modalParamResult })
-            setStudentchildren(studentchildren)
+            setstudentchildren(studentchildren)
         })
+        // if (typeof modalParamResult.xiaoguanjia_subject_id !== 'object' && typeof modalParamResult.xiaoguanjia_grade_id !== 'object') {
+        //     get_xiaoguanjia_class(modalParamResult).then(res => {
+        //         const classchildren = res.data.list.map(l1 => {
+        //             return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
+        //         })
+        //         setClasschildren([...classchildren])
+        //     })
+        // }
+        setModalParam({ ...modalParamResult })
     }
+    // //modal选择下拉框班级时的操作
+    // const modalclassChange = e => {
+    //     get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
+    //         const studentchildren = res.data.list.map(l1 => {
+    //             return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+    //         })
+    //         modalParamResult.xiaoguanjia_class_id = e
+    //         setModalParam({ ...modalParamResult })
+    //         setStudentchildren(studentchildren)
+    //     })
+    // }
     //modal选择下拉框选择学生时的操作
     const modalstudentChange = e => {
         modalParamResult.xiaoguanjia_student_ids = e
@@ -698,6 +730,7 @@ const ModalCompent = (props) => {
     }
     const modalOk = () => {
         modalParamResult.text = text
+        console.log(modalParamResult)
         props.modalOk(modalParamResult)
     }
     const modalCancel = () => {
@@ -736,19 +769,19 @@ const ModalCompent = (props) => {
                 </div>
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>年级选择：</span>
-                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_grade_id')} value={modalParamResult.xiaoguanjia_grade_id} placeholder="请选择年级">
-                        {props.gradechildren}
+                    <Select style={{ width: '100%' }} onChange={(e) => modalChange(e, 'xiaoguanjia_grade_id')} placeholder="请选择年级" value={modalParamResult.xiaoguanjia_grade_id}>
+                        {grandchildren}
                     </Select>
                 </div>
-                <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+                {/* <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>班级选择：</span>
                     <Select style={{ width: '100%' }} onChange={modalclassChange} value={modalParamResult.xiaoguanjia_class_id} placeholder="请选择班级">
                         {classchildren}
                     </Select>
-                </div>
+                </div> */}
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>学生选择：</span>
-                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} value={modalParamResult.xiaoguanjia_student_ids} placeholder="请选择学生姓名(可多选)">
+                    <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} placeholder="请选择学生姓名(可多选)" value={modalParamResult.xiaoguanjia_student_ids}>
                         {studentchildren}
                     </Select>
                 </div>
@@ -786,7 +819,7 @@ const EditorModalCompent = (props) => {
         }
     }
     const props2 = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
         onChange: addimg,
         multiple: true,
         name: 'upload_control',
@@ -866,6 +899,7 @@ const EditorModalCompent = (props) => {
     //     modalParamResult.xiaoguanjia_student_ids = e
     //     setModalParam({ ...modalParamResult })
     // }
+
     const modalOk = () => {
         modalParamResult.text = text
         props.modalOk(modalParamResult)

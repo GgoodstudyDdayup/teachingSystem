@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Descriptions, Badge, Select, Button, Result } from 'antd';
-import { get_report, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, get_xiaoguanjia_student } from '../../../axios/http'
+import { get_grade_by_teacher, getStudent_by_teacher, get_report, get_xiaoguanjia_subject } from '../../../axios/http'
 const { Option } = Select
 //配置每个表格的参数
 const columns = [[
@@ -243,14 +243,15 @@ const columns = [[
 const formTitle = [{ name: '章节分析' }, { name: '知识点分析' }, { name: '题型分析' }, { name: '错误原因分析' }]
 const Main = (props) => {
     const params = {
-        xiaoguanjia_subject_id: '58513720-d34d-442a-880b-74398a23a7db',
+        // xiaoguanjia_subject_id: '58513720-d34d-442a-880b-74398a23a7db',
         xiaoguanjia_grade_id: [],
-        xiaoguanjia_student_id: '6ad63167-f531-48de-938a-0229e3cd49e1'
+        xiaoguanjia_subject_id: [],
+        xiaoguanjia_student_id: []
+        // xiaoguanjia_student_id: '6ad63167-f531-48de-938a-0229e3cd49e1'
     }
     const [paramResult, setParams] = useState(params)
     const [subjectchildren, setSubjectchildren] = useState('')
     const [gradechildren, setGradechildren] = useState('')
-    const [classchildren, setClasschildren] = useState('')
     const [studentchildren, setStudentchildren] = useState('')
     const [student, setstudent] = useState('')
     const [subject_name, setsubject_name] = useState('')
@@ -263,24 +264,28 @@ const Main = (props) => {
             })
             setSubjectchildren([...subjectchildren])
         })
-        get_xiaoguanjia_grade().then(res => {
-            const gradechildren = res.data.list.map(res => {
-                const value = res.value.split('-')[1]
-                return <Option key={res.xiaoguanjia_id} value={res.xiaoguanjia_id} >{value}</Option>
+        getStudent_by_teacher({ teacher_employee_id: '', grade_id: '' }).then(res => {
+            console.log(res)
+            const zuoyebalist = res.data.zuoyeba_list.map(res => {
+                if (res.name) {
+                    res.name += '(作业吧)'
+                }
+                return res
             })
-            setGradechildren([...gradechildren])
-        })
-    }, [])
-    //选择下拉框班级时的操作
-    const paramsclassChange = e => {
-        paramResult.xiaoguanjia_class_id = e
-        get_xiaoguanjia_student({ xiaoguanjia_class_id: e }).then(res => {
-            const studentchildren = res.data.list.map(l1 => {
+            const result = zuoyebalist.concat(res.data.list)
+            const studentchildren = result.map(l1 => {
                 return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
             })
-            setStudentchildren([...studentchildren])
+            setStudentchildren(studentchildren)
         })
-    }
+        get_grade_by_teacher({ teacher_employee_id: '' }).then(res => {
+            const grandchildren = res.data.list.map(l1 => {
+                return <Option key={l1.grade_id} value={l1.grade_id} >{l1.grade}</Option>
+            })
+            setGradechildren(grandchildren)
+        })
+    }, [])
+
     const paramsstudentChange = e => {
         paramResult.xiaoguanjia_student_id = e
         setParams({ ...paramResult })
@@ -349,12 +354,20 @@ const Main = (props) => {
     }
     const paramsSelect = (e, res) => {
         paramResult[res] = e
-        if (typeof paramResult.xiaoguanjia_subject_id !== 'object' && typeof paramResult.xiaoguanjia_grade_id !== 'object') {
-            get_xiaoguanjia_class(paramResult).then(res => {
-                const classchildren = res.data.list.map(l1 => {
-                    return <Option key={l1.class_id} value={l1.class_id} >{l1.name}</Option>
+        if (res === 'xiaoguanjia_grade_id') {
+            getStudent_by_teacher({ teacher_employee_id: '', grade_id: e }).then(res => {
+                console.log(res)
+                const zuoyebalist = res.data.zuoyeba_list.map(res => {
+                    if (res.name) {
+                        res.name += '(作业吧)'
+                    }
+                    return res
                 })
-                setClasschildren([...classchildren])
+                const result = zuoyebalist.concat(res.data.list)
+                const studentchildren = result.map(l1 => {
+                    return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+                })
+                setStudentchildren(studentchildren)
             })
         }
         setParams({ ...paramResult })
@@ -384,11 +397,6 @@ const Main = (props) => {
                     <div className="m-left">
                         <Select style={{ width: 120 }} placeholder="请选择年级" onChange={(e) => paramsSelect(e, 'xiaoguanjia_grade_id')} value={paramResult.xiaoguanjia_grade_id}>
                             {gradechildren}
-                        </Select>
-                    </div>
-                    <div className="m-left">
-                        <Select style={{ width: 240 }} onChange={paramsclassChange} placeholder="请选择班级">
-                            {classchildren}
                         </Select>
                     </div>
                     <div className="m-left">

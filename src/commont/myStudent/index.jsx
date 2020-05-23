@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import MathJax from 'react-mathjax3'
-import { Card, Avatar, BackTop, List, Button, Divider } from 'antd';
-import { get_student_by_teacher, get_recommend_collect, get_recommend_collect_question } from '../../axios/http'
+import { Card, Avatar, BackTop, List, Button, Divider, Select } from 'antd';
+import { get_student_by_teacher, get_recommend_collect, get_recommend_collect_question, loginUserList } from '../../axios/http'
 const { Meta } = Card;
+const { Option } = Select;
 class index extends Component {
     constructor(props) {
         super(props)
@@ -10,18 +11,29 @@ class index extends Component {
             studentList: [],
             shijuanList: [],
             list: [],
+            teacherList: [],
             cdKey: false
         }
     }
     componentDidMount() {
         if (localStorage.getItem("permission") === '4' || localStorage.getItem("permission") === '3') {
-            get_student_by_teacher({ teacher_employee_id: '4a4e2786-0fc6-4630-af9a-d1d895d7aa94' }).then(res => {
+            get_student_by_teacher({ teacher_employee_id: '' }).then(res => {
                 this.setState({
                     studentList: res.data.list
                 })
             })
         } else {
-
+            loginUserList().then(res => {
+                const list = []
+                res.data.list.forEach(res => {
+                    if (res.xiaoguanjia_employee_id !== null) {
+                        list.push(<Option value={res.xiaoguanjia_employee_id} key={res.id}>{res.name}</Option>)
+                    }
+                })
+                this.setState({
+                    teacherList: list
+                })
+            })
         }
     }
     moveOrAdd = (id) => {
@@ -63,6 +75,13 @@ class index extends Component {
     back = () => {
         this.setState({
             cdKey: false
+        })
+    }
+    handleChange = e => {
+        get_student_by_teacher({ teacher_employee_id: e }).then(res => {
+            this.setState({
+                studentList: res.data.list
+            })
         })
     }
     render() {
@@ -109,17 +128,28 @@ class index extends Component {
                         </div>
                     </div>
                     :
-                    <div className='m-flex' style={{ maxHeight: 600, overflowY: 'scroll' }}>
-                        {this.state.studentList.map(res =>
-                            <Card style={{ width: 300, marginTop: 16, marginLeft: 16 }} onClick={() => this.info(res.student_id)} key={res.student_id}>
-                                <Meta
-                                    avatar={
-                                        <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                                    }
-                                    title={res.name}
-                                />
-                            </Card>
-                        )}
+                    <div>
+                        {localStorage.getItem("permission") === '4' || localStorage.getItem("permission") === '3' ?
+                            ''
+                            :
+                            <div className="m-flex">
+                                <Select placeholder="请选择老师" style={{ width: 180 }} onChange={this.handleChange} optionFilterProp="children" showSearch>
+                                    {this.state.teacherList}
+                                </Select>
+                            </div>
+                        }
+                        <div className='m-flex' style={{ maxHeight: 600, overflowY: 'scroll' }}>
+                            {this.state.studentList.map(res =>
+                                <Card style={{ width: 300, marginTop: 16, marginLeft: 16 }} onClick={() => this.info(res.student_id)} key={res.student_id}>
+                                    <Meta
+                                        avatar={
+                                            <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                                        }
+                                        title={res.name}
+                                    />
+                                </Card>
+                            )}
+                        </div>
                     </div>
                 }
             </div>

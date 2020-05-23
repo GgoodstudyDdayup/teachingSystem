@@ -4,6 +4,7 @@ import Zujuan from '../commont/zujuan/zujuan'
 import Preview from '../commont/preview/index'
 import SetPreview from '../commont/preview/index2'
 import ZTPreview from '../commont/preview/ztPreview'
+import ZTHPreview from '../commont/preview/ztHttpPreview'
 import resourceCenter from '../commont/resourceCenter/recommended/index'
 import StudentMain from '../commont/sutdent/main'
 import StudentLogin from '../commont/sutdent/login'
@@ -23,6 +24,7 @@ class router extends Component {
                         <Route path="/preview" component={Preview} />
                         <Route path="/setPreview" component={SetPreview} />
                         <Route path="/ztPreview" component={ZTPreview} />
+                        <Route path="/ztHttpPreview" component={ZTHPreview} />
                         <Route path="/studentLogin" component={StudentLogin} />
                         <Route path="/studentMain" component={StudentMain} />
                         <Route path="/dataImg" component={Data} />

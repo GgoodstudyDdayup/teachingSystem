@@ -1,6 +1,5 @@
 import React from 'react';
 import { Cascader } from 'antd';
-
 const Select = (props) => {
     return (<div>
         <Btn selectonChange={props.selectonChange} data={props.data} value={props.value}></Btn>

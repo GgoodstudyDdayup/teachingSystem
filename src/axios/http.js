@@ -10,7 +10,7 @@ export const logout = (params) => {
 }
 //downLoad下载试卷
 export const downLoadzujuan = (params) => {
-    return downLoad.get(`/api/download/self_paper?self_paper_id=${params.self_paper_id}&token=${params.token}`)
+    return downLoad.post(`/api/download/self_paper?self_paper_id=${params.self_paper_id}&token=${params.token}`)
 }
 
 //instance实例作为系统内部cookie验证每个接口
@@ -19,7 +19,7 @@ export const tree = (params) => {
 }
 //科目接口
 export const subjectList = () => {
-    return instance.get('/api/system/get_subject_list')
+    return instance.post('/api/system/get_subject_list')
 }
 //题库查询筛选接口
 export const tkList = (params) => {
@@ -31,7 +31,7 @@ export const question = (params) => {
 }
 //获取已添加试题
 export const get_ques_ids_cart = () => {
-    return instance.get('/api/question/get_ques_ids_cart ')
+    return instance.post('/api/question/get_ques_ids_cart ')
 }
 //获取真题试卷
 export const ztshijuan = (params) => {
@@ -73,7 +73,7 @@ export const kechendizhi = (params) => {
 }
 //获取后台权限组列表
 export const quanxianList = (params) => {
-    return instance.get('/api/user/get_permission_group', params)
+    return instance.post('/api/user/get_permission_group', params)
 }
 //获取后台登录用户列表
 export const loginUserList = (params) => {
@@ -85,11 +85,11 @@ export const add_user = (params) => {
 }
 //获取所有年级
 export const grade_id_List = (params) => {
-    return instance.get('/api/system/get_grade_list', params)
+    return instance.post('/api/system/get_grade_list', params)
 }
 //获取自定义科目
 export const object_id_List = (params) => {
-    return instance.get('/api/system/get_own_subject_list', params)
+    return instance.post('/api/system/get_own_subject_list', params)
 }
 //删除账号
 export const delete_user = (params) => {
@@ -137,7 +137,7 @@ export const get_teaching_group_detail = (params) => {
 
 //获取我的试题篮(按照题型分组)
 export const get_question_cart = () => {
-    return instance.get('/api/question/get_question_cart')
+    return instance.post('/api/question/get_question_cart')
 }
 //移除某类题型
 export const remove_question_type = (params) => {
@@ -146,7 +146,7 @@ export const remove_question_type = (params) => {
 
 //获取我的试题篮(按照题型分组)
 export const get_next_cart = () => {
-    return instance.get('/api/question/get_next_cart')
+    return instance.post('/api/question/get_next_cart')
 }
 //按照类排序
 export const set_ques_type_sort = (params) => {
@@ -165,10 +165,10 @@ export const set_pager_score = (params) => {
     return instance.post('/api/question/set_pager_score', params)
 }
 export const get_grade_list = () => {
-    return instance.get('/api/system/get_grade_list')
+    return instance.post('/api/system/get_grade_list')
 }
 export const get_own_subject_list = (params) => {
-    return instance.get('/api/system/get_own_subject_list')
+    return instance.post('/api/system/get_own_subject_list')
 }
 
 //试卷保存设置用于单个数据上传
@@ -184,7 +184,7 @@ export const set_self_pager = (params) => {
 
 //获取可以设置跨校区的用户
 export const get_user_by_set = () => {
-    return instance.get('/api/user/get_user_by_set')
+    return instance.post('/api/user/get_user_by_set')
 }
 //获取公司列表
 export const get_company_list = () => {
@@ -263,11 +263,11 @@ export const get_knowledge_by_section_id = (params) => {
 
 //获取校管家科目
 export const get_xiaoguanjia_subject = () => {
-    return instance.get('/api/wrong/get_xiaoguanjia_subject')
+    return instance.post('/api/wrong/get_xiaoguanjia_subject')
 }
 //获取校管家科目
 export const get_xiaoguanjia_grade = () => {
-    return instance.get('/api/wrong/get_xiaoguanjia_grade')
+    return instance.post('/api/wrong/get_xiaoguanjia_grade')
 }
 // 根据科目、年级选择校管家对应的班级
 export const get_xiaoguanjia_class = (params) => {
@@ -404,7 +404,7 @@ export const get_wrong_question_cartstion_cart = (params) => {
 }
 //获取ai提篮里的题id
 export const getques_ids_cart = (params) => {
-    return instance.get('/api/wrong/get_ques_ids_cart', params)
+    return instance.post('/api/wrong/get_ques_ids_cart', params)
 }
 
 //移除错题篮题目
@@ -434,7 +434,7 @@ export const del_directory = (params) => {
 
 //获取我的资源
 export const get_directory = (params) => {
-    return instance.get('/api/resources/get_directory', params)
+    return instance.post('/api/resources/get_directory', params)
 }
 //获取我的资源文件夹里的资源
 export const get_directory_file = (params) => {
@@ -469,6 +469,18 @@ export const get_recommend_collect = (params) => {
 export const get_recommend_collect_question = (params) => {
     return instance.post('/api/wrong/get_recommend_collect_question', params)
 }
+//根据老师获取他所带的年级
+export const get_grade_by_teacher = (params) => {
+    return instance.post('/api/wrong/get_grade_by_teacher', params)
+}
+//真题试卷预览
+export const preview_paper = (params) => {
+    return instance.post('/api/paper/preview_paper', params)
+}
+//根据老师的校管家id和年级获取对应的学生列表
+export const getStudent_by_teacher = (params) => {
+    return instance.post('/api/wrong/get_student_by_teacher', params)
+}
 
 //获取学生登录后错题列表
 export const get_user_wrong_question = (params) => {
@@ -476,11 +488,11 @@ export const get_user_wrong_question = (params) => {
 }
 //获取学生PC端的学科
 export const Sget_xiaoguanjia_subject = (params) => {
-    return studentInstance.get('/api/student/get_xiaoguanjia_subject', params)
+    return studentInstance.post('/api/student/get_xiaoguanjia_subject', params)
 }
 //获取学生PC端的年级
 export const Sget_xiaoguanjia_grade = (params) => {
-    return studentInstance.get('/api/student/get_xiaoguanjia_grade', params)
+    return studentInstance.post('/api/student/get_xiaoguanjia_grade', params)
 }
 
 

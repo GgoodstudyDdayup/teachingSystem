@@ -10,14 +10,21 @@ const CheckboxGroup = Checkbox.Group;
 const { Option } = Select
 const plainOptions = ['知识精讲', '三点剖析', '例题', '随练', '扩展'];
 const dateFormat = 'YYYY-MM-DD'
+function fun_date(aa) {
+    var date1 = new Date()
+    var date2 = new Date(date1)
+    date2.setDate(date1.getDate() + aa)
+    var time2 = date2.getFullYear() + "-" + (date2.getMonth() + 1) + "-" + date2.getDate()
+    return time2
+}
 class bk extends Component {
     constructor(props) {
         super(props)
         this.state = {
             //这个是查询条件
             parmas: {
-                starttime: '2020-02-01',
-                endtime: '',
+                starttime: null,
+                endtime: null,
                 isfinished: '',
                 page: 1,
                 page_size: 10,
@@ -53,6 +60,7 @@ class bk extends Component {
                 has_kuozhan: '扩展',
             },
             time: new Date(),
+            endtime: fun_date(7),
             fileList: [],
             checkList: [],
             visible: false,
@@ -66,7 +74,7 @@ class bk extends Component {
         let time = myDate.toLocaleDateString().split("/").join("-");
         const parmas = this.state.parmas
         parmas['starttime'] = time
-        parmas['endtime'] = time
+        parmas['endtime'] = fun_date(7)
         paike(parmas).then(res => {
             const list = res.data.list.map((res, index) => {
                 res.key = `${index}`
@@ -75,7 +83,6 @@ class bk extends Component {
             this.setState({
                 data: list,
                 totalCount: Number(res.data.total_count),
-                time,
                 parmas,
                 count: Number(res.data.total_count)
             })
@@ -467,7 +474,7 @@ class bk extends Component {
                     <span>开始时间：</span>
                     <DatePicker locale={locale} onChange={this.onchange} defaultValue={moment(this.state.time, dateFormat)} />
                     <span className="m-left">结束时间：</span>
-                    <DatePicker locale={locale} onChange={this.onchangeEnd} defaultValue={moment(this.state.time, dateFormat)} />
+                    <DatePicker locale={locale} onChange={this.onchangeEnd} defaultValue={moment(this.state.endtime, dateFormat)} />
                     <Button type="primary" style={{ marginLeft: 10 }} onClick={this.search}>
                         查询
                     </Button>

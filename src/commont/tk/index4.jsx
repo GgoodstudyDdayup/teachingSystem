@@ -18,7 +18,7 @@ class tikuguanli4 extends Component {
             ],
 
             params: {
-                subject_id: '',
+                subject_id: JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id,
                 province_id: '',
                 ques_type_id: '',
                 year: '',
@@ -30,7 +30,7 @@ class tikuguanli4 extends Component {
                 page: 1,
                 page_size: 10
             },
-            selectValue: [],
+            selectValue: [JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id],
             searchList: [],
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -261,7 +261,7 @@ class tikuguanli4 extends Component {
     }
     selectonChange = (e) => {
         const params = { ...this.state.params }
-        params.subject_id = Number(e[1])
+        params.subject_id =  e.length > 1 ? e[1] : e[0]
         params.page = 1
         question(params).then(res => {
             this.setState({
@@ -457,7 +457,7 @@ class tikuguanli4 extends Component {
         return (
             <div>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
+                <Select selectonChange={this.selectonChange} data={JSON.parse(localStorage.getItem('default_subject_list'))} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮

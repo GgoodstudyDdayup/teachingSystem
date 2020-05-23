@@ -251,7 +251,7 @@ class ExerciseBook extends Component {
     }
     render() {
         const prop = {
-            action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+            action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
             onChange: this.handleChange2,
             multiple: true,
             name: 'upload_control',
@@ -399,7 +399,7 @@ const AddBook = (props) => {
         }
     }
     const prop = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
         onChange: handleChange2,
         multiple: true,
         name: 'upload_control',

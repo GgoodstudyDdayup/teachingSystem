@@ -4,9 +4,10 @@ import Select from './selection'
 import Know from './knowlist'
 import List from './list'
 import Searchbtn from './searchbtn'
-import { save_file, get_directory, tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type, get_paper_info } from '../../axios/http'
+import { ztshijuan, save_file, get_directory, tkList, subjectList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type, get_paper_info } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
+import Md5 from 'js-md5'
 const { TabPane } = Tabs;
 class tikuguanli2 extends Component {
     constructor(props) {
@@ -17,7 +18,7 @@ class tikuguanli2 extends Component {
             ],
             searchList: [],
             params: {
-                subject_id: 39,
+                subject_id: JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id,
                 province_id: '',
                 ques_type_id: '',
                 year: '',
@@ -35,7 +36,7 @@ class tikuguanli2 extends Component {
                 file_name: '',
                 type_id: 2
             },
-            selectValue: [],
+            selectValue: [JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id],
             cart_ques_ids: '',
             options: store.getState().XueKeList,
             unsubscribe: store.subscribe(() => {
@@ -46,7 +47,9 @@ class tikuguanli2 extends Component {
             question_cart: [],
             spin: false,
             clear: 'none',
-            cardTotal: 10
+            cardTotal: 10,
+            bck: '',
+            paper_id: ''
         }
     }
     //更改筛选筛选条件查询更改params
@@ -217,11 +220,14 @@ class tikuguanli2 extends Component {
                 treeA: res.data.list
             })
         })
+        ztshijuan(params).then(res => {
+            this.listView2(res.data.list[0].aitifen_id)
+
+        })
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
     }
     shaixuanName = (...e) => {
-        console.log(e[0])
         const change = {
             province_rela_list: e[0].province_rela_list,
             grade_rela_list: e[0].grade_rela_list,
@@ -278,7 +284,7 @@ class tikuguanli2 extends Component {
     }
     selectonChange = (e) => {
         const params = { ...this.state.params }
-        params.subject_id = Number(e[1])
+        params.subject_id = e.length > 1 ? e[1] : e[0]
         params.page = 1
         this.setState({
             params,
@@ -390,12 +396,20 @@ class tikuguanli2 extends Component {
         collectParams.file_name = res
         params.page = page
         get_paper_info({ paper_id: e }).then(res => {
-
-            console.log(res)
             this.setState({
                 params,
                 list: res.data.ques_list,
-                collectParams
+                collectParams,
+                bck: e,
+                paper_id: e
+            })
+        })
+    }
+    listView2 = (e) => {
+        get_paper_info({ paper_id: e }).then(res => {
+            this.setState({
+                list: res.data.ques_list,
+                bck: e
             })
         })
     }
@@ -432,8 +446,10 @@ class tikuguanli2 extends Component {
             message.warning('请先选择试卷')
             return
         }
+        const date = new Date()
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
         localStorage.setItem('previewData', JSON.stringify(this.state.list))
-        window.open('/#/ztPreview')
+        window.open(`http://devjiaoxueapi.yanuojiaoyu.com/api/download/show_paperinfo?paper_id=${this.state.paper_id}&token=${Md5(ymdh)}`)
     }
     collect = () => {
         if (this.state.list.length === 0) {
@@ -488,7 +504,7 @@ class tikuguanli2 extends Component {
         return (
             <div>
                 <Modal
-                    title='移动文件'
+                    title='添加到我的资源文件夹'
                     visible={this.state.visible3}
                     onOk={this.moveFile}
                     onCancel={this.cancleMoveFile}
@@ -501,7 +517,7 @@ class tikuguanli2 extends Component {
                     />
                 </Modal>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
+                <Select selectonChange={this.selectonChange} data={JSON.parse(localStorage.getItem('default_subject_list'))} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮
@@ -540,13 +556,13 @@ class tikuguanli2 extends Component {
 
                     </TabPane>
                     <TabPane tab="真题试卷" key="2" >
-                        <div className="knowlage">
+                        <div className="knowlage" style={{ justifyContent: 'start' }}>
                             <div className="tree" >
-                                <Know changePage={this.changePage} params={this.state.params} listView={this.listView}></Know>
+                                <Know bck={this.state.bck} changePage={this.changePage} params={this.state.params} listView={this.listView} listView2={this.listView2}></Know>
                             </div>
-                            <div >
+                            <div style={{ width: '100%' }}>
                                 <div id='scroll-y' className="list" style={this.state.height > 638 ? { height: 600, width: '100%' } : { height: 400, width: '100%' }}>
-                                    <div>
+                                    <div style={{ width: '100%' }}>
                                         <Searchbtn params={this.state.params} list={this.state.searchList} funt={this.changeSearchId}></Searchbtn>
                                         {/* <Search className="m-bottom" placeholder="试题内容搜索" onSearch={this.keyWord} enterButton /> */}
                                         {/* <div className="m-scroll-list"> */}

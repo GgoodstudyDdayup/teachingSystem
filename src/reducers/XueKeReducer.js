@@ -1,5 +1,6 @@
 import { XueKeActionTypes } from '../actions/XueKeList'
 const XueKeReducer = (preState = [], action) => {
+    console.log(preState)
     const xiaoxue = []
     const chuzhong = []
     const gaozhong = []
@@ -19,7 +20,7 @@ const XueKeReducer = (preState = [], action) => {
                 } else {
                     item[2].name === '高中' ? item[2].key = true : item[2].name = '高中'
                     item[2].code === '高中' ? item[2].key = true : item[2].subject_id = '高中'
-                    gaozhong.push(res)
+                    gaozhong.push(res) 
                     item[2].items = gaozhong
                 }
                 return item

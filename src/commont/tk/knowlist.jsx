@@ -6,7 +6,7 @@ import { ztshijuan } from '../../axios/http'
 const Knowlage = (props) => {
     const [total_count, setTotal_count] = useState(0)
     const [count, setCount] = useState(1)
-    const [shijuanList, setShijuanList] = useState('')
+    const [shijuanList, setShijuanList] = useState([])
     const onChangePage = (e) => {
         // props.params.page = e
         props.changePage(e)
@@ -38,7 +38,8 @@ const Knowlage = (props) => {
                     size='small'
                     renderItem={item => (
                         <List.Item
-                            onClick={() => props.listView(item.aitifen_id, item.show_name,count)}
+                            style={props.bck === item.aitifen_id ? { background: '#f5f7fa' } : {}}
+                            onClick={() => props.listView(item.aitifen_id, item.show_name, count)}
                         >
                             <List.Item.Meta
                                 avatar={<Avatar src={require('../../img/shijuan.png')} />}

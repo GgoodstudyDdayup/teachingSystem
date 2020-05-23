@@ -59,7 +59,7 @@ class bk extends Component {
             data: [
             ],
             selsectSchool: [],
-            state:''
+            state: ''
         }
     }
     componentDidMount() {
@@ -577,13 +577,17 @@ class bk extends Component {
         const upParmas = this.state.upParmas
         let value = this.state.value
         let value3 = this.state.value3
-
         get_user_detail(user_id).then(res => {
+            console.log(res.data.model)
             upParmas.name = res.data.model.name
             upParmas.username = res.data.model.username
             upParmas.user_id = res.data.model.id
             upParmas.permission = res.data.model.permission
             upParmas.teacher_type = res.data.model.teacher_type
+            upParmas.state = res.data.model.state === '0' || res.data.model.state === '1' ? '1' : res.data.model.state
+            this.setState({
+                upParmas
+            })
             value = Number(res.data.model.permission)
             value3 = Number(res.data.model.teacher_type)
             if (res.data.model.tags) {
@@ -822,7 +826,7 @@ class bk extends Component {
                 align: 'center',
                 render: (text) => (
                     <span>
-                        {text==='1'?<Tag color='green'>正常</Tag>:<Tag color='magenta'>冻结</Tag>}
+                        {text === '1' ? <Tag color='green'>正常</Tag> : <Tag color='magenta'>冻结</Tag>}
                     </span>
                 ),
             },
@@ -923,9 +927,9 @@ class bk extends Component {
                     </div>
                     <div className="m-flex m-bottom">
                         <span className="m-row">账户状态：</span>
-                        <Radio.Group onChange={this.onchangeStateRadio2} value={this.state.state}>
-                            <Radio value={1}>正常</Radio>
-                            <Radio value={2}>冻结</Radio>
+                        <Radio.Group onChange={this.onchangeStateRadio2} value={this.state.upParmas.state}>
+                            <Radio value='1'>正常</Radio>
+                            <Radio value='2'>冻结</Radio>
                         </Radio.Group>
                     </div>
                     <div className="m-flex m-bottom">

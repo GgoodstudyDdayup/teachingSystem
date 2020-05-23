@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined, PieChartOutlined } from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined,PieChartOutlined} from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -217,6 +217,26 @@ class main extends Component {
                                 <Link to="/main/bk/kejian">组卷审核</Link>
                             </Menu.Item>}
                         </SubMenu>
+                        {/* <SubMenu
+                            key="55"
+                            title={
+                                <span>
+                                    <Icon type="mail" />
+                                    <span>授课系统</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu>
+                        <SubMenu
+                            key="sub4"
+                            title={
+                                <span>
+                                    <Icon type="setting" />
+                                    <span>作业管理</span>
+                                </span>
+                            }
+                        >
+                        </SubMenu> */}
                         <SubMenu
                             key="sub22"
                             title={
@@ -229,9 +249,12 @@ class main extends Component {
                             <Menu.Item key="226">
                                 <Link to='/main/wrongQuestion/reportForm'>小亚报表</Link>
                             </Menu.Item>
-                            <Menu.Item key="225">
+                            {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2'?'':<Menu.Item key="225">
                                 <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
-                            </Menu.Item>
+                            </Menu.Item>}
+                            {/* <Menu.Item key="225">
+                                <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
+                            </Menu.Item> */}
                         </SubMenu>
                         <Menu.Item key="227">
                             <ContainerOutlined />
@@ -239,32 +262,6 @@ class main extends Component {
                             </span>
                             <Link to='/main/wrongQuestion/exerciseBook'></Link>
                         </Menu.Item>
-                        {/* <Menu.Item key="228" onClick={this.dataImg}>
-                            <ContainerOutlined />
-                            <span>REP学员数据报表
-                            </span>
-                            <Link to='/dataImg'></Link>
-                        </Menu.Item> */}
-                        {/* <SubMenu
-                            key="55"
-                            title={
-                                <span>
-                                    <Icon type="mail" />
-                                    <span>授课系统</span>
-                                </span>
-                            }
-                        >
-                        </SubMenu>
-                        <SubMenu
-                            key="44"
-                            title={
-                                <span>
-                                    <Icon type="mail" />
-                                    <span>课后练习</span>
-                                </span>
-                            }
-                        >
-                        </SubMenu> */}
                         {/* <SubMenu
                             key="33"
                             title={
@@ -275,6 +272,14 @@ class main extends Component {
                             }
                         >
                         </SubMenu> */}
+                        {/* <Menu.Item key="228" onClick={this.dataImg}>
+                            <ContainerOutlined />
+                            <span>REP学员数据报表
+                            </span>
+                            <Link to='/dataImg'></Link>
+                        </Menu.Item> */}
+
+                        
                         {/* <SubMenu
                             key="ss"
                             title={
@@ -285,16 +290,7 @@ class main extends Component {
                             }
                         >
                         </SubMenu> */}
-                        {/* <SubMenu
-                            key="sub4"
-                            title={
-                                <span>
-                                    <Icon type="setting" />
-                                    <span>作业管理</span>
-                                </span>
-                            }
-                        >
-                        </SubMenu> */}
+
                         <Menu.Item key="228">
                             <PieChartOutlined />
                             <span>我的学员</span>
@@ -309,9 +305,9 @@ class main extends Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="13">
+                            {/* <Menu.Item key="13">
                                 <Link to="/main/resourceCenter/recommended">推荐资源</Link>
-                            </Menu.Item>
+                            </Menu.Item> */}
                             <Menu.Item key="14">
                                 <Link to="/main/resourceCenter/zj">我的资源</Link>
                             </Menu.Item>
@@ -439,7 +435,7 @@ class main extends Component {
                             <Route path="/main/wrongQuestion/exerciseBook/info" component={ExerciseBookInfo} />
                             {/* 我的学员 */}
                             <Route path="/main/StudentMine" component={StudentMine} />
-                            
+
 
 
                             <Route path="/main/zy" component={ZY} />

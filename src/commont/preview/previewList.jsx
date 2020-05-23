@@ -6,7 +6,7 @@ const ListT = (props) => {
     const total = props.data.map((res, index) =>
         <MathJax.Context
             key={index}
-            input='tex'
+            input='ascii'
             onError={(MathJax, error) => {
                 console.warn(error);
                 console.log("Encountered a MathJax error, re-attempting a typeset!");
@@ -32,12 +32,13 @@ const ListT = (props) => {
                 {res.ques_options ?
                     <div style={{ display: 'flex' }}>
                         <span>{index + 1 + '、'}</span>
-                        <MathJax.Html html={res.ques_content + res.ques_options} />
+                        <MathJax.Html html={res.ques_content+res.ques_options} />
                     </div>
                     : <div style={{ display: 'flex' }}>
                         <span>{index + 1 + '、'}</span>
                         <MathJax.Html html={res.ques_content} />
                     </div>}
+
             </div>
         </MathJax.Context>
     )

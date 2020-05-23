@@ -4,7 +4,7 @@ import Select from './selection'
 import TreeA from './tree'
 import List from './list'
 import Searchbtn from './searchbtn'
-import {save_file, get_directory, tree, subjectList, tkList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
+import { save_file, get_directory, tree, subjectList, tkList, question, add_question_cart, get_ques_ids_cart, remove_question_cart, get_question_cart, remove_question_type } from '../../axios/http'
 import store from '../../store/index'
 import { XueKeActionCreators } from '../../actions/XueKeList'
 const { Search } = Input
@@ -17,7 +17,7 @@ class tikuguanli extends Component {
 
             ],
             params: {
-                subject_id: 39,
+                subject_id: JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id,
                 knowledge_id: '',
                 ques_type_id: '',
                 province_id: '',
@@ -63,7 +63,7 @@ class tikuguanli extends Component {
             }],
             tree: [
             ],
-            selectValue: [],
+            selectValue: [JSON.parse(localStorage.getItem('default_subject_list'))[0].subject_id],
             cart_ques_ids: [],
             spin: false,
             clear: 'none',
@@ -317,8 +317,9 @@ class tikuguanli extends Component {
         this.props.history.push('/main/zujuan')
     }
     selectonChange = (value) => {
+        console.log(value)
         const params = {
-            subject_id: value[1],
+            subject_id: value.length > 1 ? value[1] : value[0],
             knowledge_id: '',
             ques_type_id: '',
             province_id: '',
@@ -523,7 +524,7 @@ class tikuguanli extends Component {
         return (
             <div>
                 <Modal
-                    title='移动文件'
+                    title='添加到我的资源文件夹'
                     visible={this.state.visible3}
                     onOk={this.moveFile}
                     onCancel={this.cancleMoveFile}
@@ -536,7 +537,7 @@ class tikuguanli extends Component {
                     />
                 </Modal>
                 <Spin tip="加载中..." size="large" className={this.state.spin ? 'm-spin' : 'm-spin-dis'} />
-                <Select selectonChange={this.selectonChange} data={this.state.options} value={this.state.selectValue}></Select>
+                <Select selectonChange={this.selectonChange} data={JSON.parse(localStorage.getItem('default_subject_list'))} value={this.state.selectValue}></Select>
                 <div className="m-shopcar" onMouseEnter={() => this.mouse('enter')} onMouseLeave={() => this.mouse()}>
                     <Icon type="container" style={{ margin: `0 15px 0 0` }} />
                     我的试题篮

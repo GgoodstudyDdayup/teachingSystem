@@ -88,7 +88,7 @@ const Main = (props) => {
         }
     }
     const prop = {
-        action: 'https://devjiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
+        action: 'https://jiaoxueapi.yanuojiaoyu.com/api/upload/upload_file',
         onChange: handleChange2,
         multiple: true,
         name: 'upload_control',
