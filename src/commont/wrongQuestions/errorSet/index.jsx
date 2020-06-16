@@ -3,7 +3,8 @@ import { Tabs, Drawer, Input, Button, Radio, Col, Row, Select, Upload, Icon, Pag
 import { ContentUtils } from 'braft-utils'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/index.css'
-import ImgCrop from 'antd-img-crop';
+import ImageEditor from 'image-editor-little';
+// import ImgCrop from 'antd-img-crop';
 import Finished from './finished'
 import { getStudent_by_teacher, get_grade_by_teacher, edit_wrong_question, analysis_question, get_knowledge, get_analysis_option, get_xiaoguanjia_subject, get_xiaoguanjia_grade, get_xiaoguanjia_class, submit_wrong_question, wrong_get_list, del_wrong_question } from '../../../axios/http'
 const { TabPane } = Tabs
@@ -72,11 +73,8 @@ const Main = (props) => {
     const [zjList, setZjList] = useState([])
     const [zjChildrenList, setZjChildrenList] = useState([])
     const [knowlageList, setKnowlageList] = useState([])
-
     const [countNumber, setCount] = useState(0)
-
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
-
     useEffect(() => {
         setHeight(document.body.clientHeight)
     }, [height])
@@ -148,7 +146,7 @@ const Main = (props) => {
         name: 'upload_control',
         headers: {
             token: localStorage.getItem("token"),
-            username: localStorage.getItem("username"),
+            username: encodeURI(localStorage.getItem("username")),
             companyid: localStorage.getItem("companyid"),
         },
         data: {
@@ -607,14 +605,18 @@ const ModalCompent = (props) => {
     // const [studentchildren, setStudentchildren] = useState([])
     const [text, setText] = useState('')
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+    const [visible3, setVisible3] = useState(false)
+    const [cImg, setcImg] = useState('')
     const addimg = e => {
         if (e.file.status !== "uploading") {
-            console.log(modalParamResult.text)
-            modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
-                type: 'IMAGE',
-                url: e.file.response.data.full_path
-            }])
-            setModalParam({ ...modalParamResult })
+            setVisible3(true)
+            setcImg(e.file.response.data.full_path)
+            // console.log(modalParamResult.text)
+            // modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+            //     type: 'IMAGE',
+            //     url: e.file.response.data.full_path
+            // }])
+            // setModalParam({ ...modalParamResult })
         } else {
             return false
         }
@@ -626,41 +628,40 @@ const ModalCompent = (props) => {
         name: 'upload_control',
         headers: {
             token: localStorage.getItem("token"),
-            username: localStorage.getItem("username"),
+            username: encodeURI(localStorage.getItem("username")),
             companyid: localStorage.getItem("companyid"),
-
         },
         data: {
             type: 2
         }
     }
-    const props3 = {
-        width: 1000,  //裁剪宽度
-        height: 500, //裁剪高度
-        resize: true, //裁剪是否可以调整大小
-        resizeAndDrag: true, //裁剪是否可以调整大小、可拖动
-        modalTitle: "上传图片", //弹窗标题
-        modalWidth: 600, //弹窗宽度
-    };
+    // const props3 = {
+    //     width:1000,
+    //     height:900,
+    //     resize: true, //裁剪是否可以调整大小
+    //     resizeAndDrag: true, //裁剪是否可以调整大小、可拖动
+    //     modalTitle: "上传图片", //弹窗标题
+    //     modalWidth: 800, //弹窗宽度
+    // };
     const extendControls = [
         {
             key: 'antd-uploader',
             type: 'component',
             component: (
-                <ImgCrop {...props3}>
-                    <Upload
-                        {...props2}
-                        accept="image/*"
-                        showUploadList={false}
-                    // customRequest={this.uploadHandler}
-                    // beforeUpload={this.beforeUpload}
-                    >
-                        {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
-                        <button type="button" className="control-item button upload-button" data-title="插入图片">
-                            <Icon type="picture" theme="filled" />
-                        </button>
-                    </Upload>
-                </ImgCrop>
+                // <ImgCrop {...props3}>
+                <Upload
+                    {...props2}
+                    accept="image/*"
+                    showUploadList={false}
+                // customRequest={this.uploadHandler}
+                // beforeUpload={this.beforeUpload}
+                >
+                    {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                    <button type="button" className="control-item button upload-button" data-title="插入图片">
+                        <Icon type="picture" theme="filled" />
+                    </button>
+                </Upload>
+                // </ImgCrop>
             )
         }
     ]
@@ -668,7 +669,7 @@ const ModalCompent = (props) => {
         setModalParam({ ...props.modalParams })
     }, [props.modalParams])
     useEffect(() => {
-        getStudent_by_teacher({ teacher_employee_id: '', grade_id: '' }).then(res => {
+        getStudent_by_teacher({ teacher_employee_id: '', grade_id: '', xiaoguanjia_subject_id: '' }).then(res => {
             console.log(res)
             const zuoyebalist = res.data.zuoyeba_list.map(res => {
                 if (res.name) {
@@ -696,9 +697,9 @@ const ModalCompent = (props) => {
     //modal选择下拉框科目年级时的操作
     const modalChange = (e, res) => {
         modalParamResult[res] = e
-        getStudent_by_teacher({ teacher_employee_id: '', grade_id: e }).then(res => {
+        getStudent_by_teacher({ teacher_employee_id: '', grade_id: modalParamResult.xiaoguanjia_grade_id, xiaoguanjia_subject_id: modalParamResult.xiaoguanjia_subject_id }).then(res => {
             const studentchildren = res.data.list.map(l1 => {
-                return <Option key={l1.student_id} value={l1.student_id} >{l1.name}</Option>
+                return <Option key={l1.student_id} value={l1.student_id}>{l1.name}</Option>
             })
             setstudentchildren(studentchildren)
         })
@@ -736,6 +737,12 @@ const ModalCompent = (props) => {
     const modalCancel = () => {
         props.modalCancel()
     }
+    const modalOk2 = () => {
+        setVisible3(false)
+    }
+    const modalCancel2 = () => {
+        setVisible3(false)
+    }
     const getContent = (editorState) => {
         setText(editorState.toHTML())
     }
@@ -744,6 +751,14 @@ const ModalCompent = (props) => {
         getContent(html)
         modalParamResult.text = editorState
         setModalParam({ ...modalParamResult })
+    }
+    const caijian = (e) => {
+        console.log(e)
+        modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+            type: 'IMAGE',
+            url: e
+        }])
+        setVisible3(false)
     }
     return (
         <div>
@@ -779,6 +794,21 @@ const ModalCompent = (props) => {
                         {classchildren}
                     </Select>
                 </div> */}
+                <Modal
+                    title="裁剪图片"
+                    visible={visible3}
+                    onOk={modalOk2}
+                    onCancel={modalCancel2}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <ImageEditor
+                        width={470}
+                        height={400}
+                        src={cImg}
+                        onConfirm={caijian}
+                    />
+                </Modal>
                 <div className="m-flex m-bottom" style={{ flexWrap: 'nowrap', justifyContent: 'space-between' }}>
                     <span className="m-row" style={{ textAlign: 'right' }}>学生选择：</span>
                     <Select style={{ width: '100%' }} mode="multiple" optionFilterProp="children" showSearch onChange={modalstudentChange} placeholder="请选择学生姓名(可多选)" value={modalParamResult.xiaoguanjia_student_ids}>
@@ -807,13 +837,17 @@ const EditorModalCompent = (props) => {
     // const [studentchildren, setStudentchildren] = useState([])
     const [text, setText] = useState(modalParams.text.toHTML())
     const controls = ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'separator']
+    const [visible3, setVisible3] = useState(false)
+    const [cImg, setcImg] = useState('')
     const addimg = e => {
         if (e.file.status !== "uploading") {
-            modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
-                type: 'IMAGE',
-                url: e.file.response.data.full_path
-            }])
-            setModalParam({ ...modalParamResult })
+            setVisible3(true)
+            setcImg(e.file.response.data.full_path)
+            // modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+            //     type: 'IMAGE',
+            //     url: e.file.response.data.full_path
+            // }])
+            // setModalParam({ ...modalParamResult })
         } else {
             return false
         }
@@ -825,7 +859,7 @@ const EditorModalCompent = (props) => {
         name: 'upload_control',
         headers: {
             token: localStorage.getItem("token"),
-            username: localStorage.getItem("username"),
+            username: encodeURI(localStorage.getItem("username")),
             companyid: localStorage.getItem("companyid"),
 
         },
@@ -833,33 +867,33 @@ const EditorModalCompent = (props) => {
             type: 2
         }
     }
-    const props3 = {
-        width: 1000,  //裁剪宽度
-        height: 500, //裁剪高度
-        resize: true, //裁剪是否可以调整大小
-        resizeAndDrag: true, //裁剪是否可以调整大小、可拖动
-        modalTitle: "上传图片", //弹窗标题
-        modalWidth: 600, //弹窗宽度
-    };
+    // const props3 = {
+    //     width:1000,
+    //     height:900,
+    //     resize: true, //裁剪是否可以调整大小
+    //     resizeAndDrag: true, //裁剪是否可以调整大小、可拖动
+    //     modalTitle: "上传图片", //弹窗标题
+    //     modalWidth: 800, //弹窗宽度
+    // };
     const extendControls = [
         {
             key: 'antd-uploader',
             type: 'component',
             component: (
-                <ImgCrop {...props3}>
-                    <Upload
-                        {...props2}
-                        accept="image/*"
-                        showUploadList={false}
-                    // customRequest={this.uploadHandler}
-                    // beforeUpload={this.beforeUpload}
-                    >
-                        {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
-                        <button type="button" className="control-item button upload-button" data-title="插入图片">
-                            <Icon type="picture" theme="filled" />
-                        </button>
-                    </Upload>
-                </ImgCrop>
+                // <ImgCrop {...props3}>
+                <Upload
+                    {...props2}
+                    accept="image/*"
+                    showUploadList={false}
+                // customRequest={this.uploadHandler}
+                // beforeUpload={this.beforeUpload}
+                >
+                    {/* 这里的按钮最好加上type="button"，以避免在表单容器中触发表单提交，用Antd的Button组件则无需如此 */}
+                    <button type="button" className="control-item button upload-button" data-title="插入图片">
+                        <Icon type="picture" theme="filled" />
+                    </button>
+                </Upload>
+                // </ImgCrop>
             )
         }
     ]
@@ -907,6 +941,12 @@ const EditorModalCompent = (props) => {
     const modalCancel = () => {
         props.modalCancel()
     }
+    const modalOk2 = () => {
+        setVisible3(false)
+    }
+    const modalCancel2 = () => {
+        setVisible3(false)
+    }
     const getContent = (editorState) => {
         setText(editorState.toHTML())
     }
@@ -915,6 +955,14 @@ const EditorModalCompent = (props) => {
         getContent(html)
         modalParamResult.text = editorState
         setModalParam({ ...modalParamResult })
+    }
+    const caijian = (e) => {
+        console.log(e)
+        modalParamResult.text = ContentUtils.insertMedias(modalParamResult.text, [{
+            type: 'IMAGE',
+            url: e
+        }])
+        setVisible3(false)
     }
     return (
         <div>
@@ -956,6 +1004,21 @@ const EditorModalCompent = (props) => {
                         {studentchildren}
                     </Select>
                 </div> */}
+                <Modal
+                    title="裁剪图片"
+                    visible={visible3}
+                    onOk={modalOk2}
+                    onCancel={modalCancel2}
+                    okText='确认'
+                    cancelText='取消'
+                >
+                    <ImageEditor
+                        width={470}
+                        height={400}
+                        src={cImg}
+                        onConfirm={caijian}
+                    />
+                </Modal>
                 <div className="editor-wrapper my-component my-editor-component">
                     <BraftEditor
                         value={modalParamResult.text}

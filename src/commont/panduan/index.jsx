@@ -78,7 +78,7 @@ export default class EditorDemo extends React.Component {
             name: 'upload_control',
             headers: {
                 token: localStorage.getItem("token"),
-                username: localStorage.getItem("username"),
+                username: encodeURI(localStorage.getItem("username")),
                 companyid: localStorage.getItem("companyid"),
             },
             data: {
@@ -112,7 +112,7 @@ export default class EditorDemo extends React.Component {
             name: 'upload_control',
             headers: {
                 token: localStorage.getItem("token"),
-                username: localStorage.getItem("username"),
+                username: encodeURI(localStorage.getItem("username")),
                 companyid: localStorage.getItem("companyid"),
                 
             },

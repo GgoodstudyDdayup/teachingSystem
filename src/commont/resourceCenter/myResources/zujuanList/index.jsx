@@ -440,7 +440,7 @@ class tikuguanli2 extends Component {
     }
     linkPreview = () => {
         const date = new Date()
-        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()<10?'0'+(date.getDate()):date.getDate()}${date.getHours()<10?'0'+(date.getHours()):date.getHours()}`
         window.open(`/#/preview?self_paper_id=${this.state.self_paper_id}&token=${Md5(ymdh)}`)
     }
     deleteZj = () => {
@@ -490,7 +490,7 @@ class tikuguanli2 extends Component {
     }
     download = () => {
         const date = new Date()
-        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()<10?'0'+(date.getDate()):date.getDate()}${date.getHours()<10?'0'+(date.getHours()):date.getHours()}`
         const param = {
             token: Md5(ymdh),
             self_paper_id: this.state.self_paper_id

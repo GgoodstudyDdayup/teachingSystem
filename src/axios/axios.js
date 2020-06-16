@@ -4,9 +4,9 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 // import store from '../store'
 // 线上环境域名
-// axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com/'
+axios.defaults.baseURL = 'https://jiaoxueapi.yanuojiaoyu.com/'
 //开发环境域名
-axios.defaults.baseURL = 'https://devjiaoxueapi.yanuojiaoyu.com/'
+// axios.defaults.baseURL = 'https://devjiaoxueapi.yanuojiaoyu.com/'
 axios.defaults.transformRequest = [
     function (data) {
         let ret = "";
@@ -31,7 +31,6 @@ instance.interceptors.request.use(function (config) {
 }, function (error) {
     return Promise.reject(error);
 });
-
 instance.interceptors.response.use(response => {
     if (response.data.code === '404') {
         window.location.replace("http://jiaoxue.yanuojiaoyu.com");

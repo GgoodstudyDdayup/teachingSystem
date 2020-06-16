@@ -64,11 +64,13 @@ class Login extends Component {
                         }
                         localStorage.setItem('saveParams', JSON.stringify(save))
                         if (res.data.data.company_list !== null && res.data.data.company_list.length > 0) {
+                            console.log(222)
                             localStorage.setItem("company_list", JSON.stringify(res.data.data.company_list))
                             localStorage.setItem('company', res.data.data.company_list[0].company)
                             localStorage.setItem('company_id', res.data.data.company_list[0].company_id || res.data.data.user_info.company_id)
                             this.props.history.push("/main")
                         } else {
+                            console.log(111)
                             get_company_list().then(l1 => {
                                 if (l1.code === 0) {
                                     const company_list = l1.data.company_list.reduce((item, rsq) => {
@@ -77,6 +79,7 @@ class Login extends Component {
                                         }
                                         return item
                                     }, [])
+                                    console.log(company_list)
                                     localStorage.setItem("company_list", JSON.stringify(company_list))
                                     localStorage.setItem('company', company_list[0].company)
                                     localStorage.setItem('company_id', company_list[0].id)

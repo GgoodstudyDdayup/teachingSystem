@@ -190,17 +190,17 @@ class bk extends Component {
     changePage = page => {
         const parmas = { ...this.state.parmas }
         parmas.page = page
-        // paike(parmas).then(res => {
-        //     const list = res.data.list.map((res, index) => {
-        //         res.key = `${index}`
-        //         return res
-        //     })
-        //     this.setState({
-        //         data: list,
-        //         totalCount: Number(res.data.total_count),
-        //         parmas
-        //     })
-        // })
+        jindu(parmas).then(res => {
+            const list = res.data.list.map((res, index) => {
+                res.key = `${index}`
+                return res
+            })
+            this.setState({
+                data: list,
+                totalCount: Number(res.data.total_count),
+                parmas
+            })
+        })
     };
     search = () => {
         const parmas = this.state.parmas

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route, Link, Switch, withRouter } from 'react-router-dom'
 import { Layout, Menu, Icon, Avatar, Dropdown, message, Modal, Input, Select } from 'antd';
 import { logout, change_password_byself } from '../axios/http'
-import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined,PieChartOutlined} from '@ant-design/icons'
+import { LogoutOutlined, EditTwoTone, SlidersOutlined, RadarChartOutlined, ContainerOutlined, PieChartOutlined } from '@ant-design/icons'
 import Tk from './tk/index'
 import Tksystem from './tk/index2'
 import Tkown from './tk/index3'
@@ -35,7 +35,6 @@ import StudentMine from '../commont/myStudent'
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 const { Option } = Select
-
 class main extends Component {
     constructor(opt) {
         super(opt)
@@ -50,6 +49,7 @@ class main extends Component {
         }
     }
     componentDidMount() {
+        console.log(this.state.company_list)
         window.addEventListener('resize', this.handleSize);
         this.handleSize()
         localStorage.setItem('enter', '')
@@ -246,15 +246,16 @@ class main extends Component {
                                 </span>
                             }
                         >
+                            <Menu.Item key="225">
+                                <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
+                            </Menu.Item>
                             <Menu.Item key="226">
                                 <Link to='/main/wrongQuestion/reportForm'>小亚报表</Link>
                             </Menu.Item>
-                            {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2'?'':<Menu.Item key="225">
+                            {/* {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2' ? '' : <Menu.Item key="225">
                                 <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
-                            </Menu.Item>}
-                            {/* <Menu.Item key="225">
-                                <Link to='/main/wrongQuestion/errorSet'>小亚错题集</Link>
-                            </Menu.Item> */}
+                            </Menu.Item>} */}
+
                         </SubMenu>
                         <Menu.Item key="227">
                             <ContainerOutlined />
@@ -279,7 +280,7 @@ class main extends Component {
                             <Link to='/dataImg'></Link>
                         </Menu.Item> */}
 
-                        
+
                         {/* <SubMenu
                             key="ss"
                             title={
@@ -347,7 +348,8 @@ class main extends Component {
                                 type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                                 onClick={this.toggle}
                             />
-                            {localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2' ?
+                            {/* localStorage.getItem("permission") === '1' || localStorage.getItem("permission") === '2' */}
+                            {this.state.company_list.length > 1 ?
                                 <span>
                                     <Select style={{ width: 170 }} showSearch optionFilterProp="children" onChange={this.selsectCompany} value={this.state.company_name} placeholder="请选择校区" >
                                         {this.state.children}

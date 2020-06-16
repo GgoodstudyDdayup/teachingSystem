@@ -678,9 +678,13 @@ class bk extends Component {
         if (localStorage.getItem('permission') === '1') {
             if (e.permission === '1') {
                 const btnPermission = (
-                    <div>
-                        {/* <Button className="m-left" type="primary" onClick={() => this.detail(e)}>修改</Button> */}
-                        <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                    <div className="m-flex">
+                        <div className="m-left">
+                            <Button  type="primary" onClick={() => this.detail(e)}>修改</Button>
+                        </div>
+                        <div className="m-left">
+                            <Button type="primary" onClick={() => this.detailPassword(e)}>修改密码</Button>
+                        </div>
                     </div>
                 )
                 return btnPermission

@@ -175,7 +175,9 @@ class tikuguanli4 extends Component {
                 })
             })
 
-
+            tkList({ subject_id: params.subject_id }).then(res => {
+                this.shaixuanName(res.data)
+            })
             tkList({ subject_id: params.subject_id }).then(res => {
                 this.shaixuanName(res.data)
             })
@@ -197,6 +199,12 @@ class tikuguanli4 extends Component {
             })
             tkList({ subject_id: params.subject_id }).then(res => {
                 this.shaixuanName(res.data)
+            })
+            question(params).then(res => {
+                this.setState({
+                    list: res.data.list,
+                    totalCount: Number(res.data.total_count),
+                })
             })
             get_question_cart().then(res => {
                 let cardTotal = null
@@ -261,7 +269,7 @@ class tikuguanli4 extends Component {
     }
     selectonChange = (e) => {
         const params = { ...this.state.params }
-        params.subject_id =  e.length > 1 ? e[1] : e[0]
+        params.subject_id = e.length > 1 ? e[1] : e[0]
         params.page = 1
         question(params).then(res => {
             this.setState({
@@ -393,7 +401,7 @@ class tikuguanli4 extends Component {
         this.props.history.push({ pathname: '/main/question', state: { ques_id: id, sbjArray } })
     }
     deleteLei = (id) => {
-        const params = {...this.state.params}
+        const params = { ...this.state.params }
         remove_question_type({ ques_type_id: id }).then(res => {
             message.success(res.message)
             get_ques_ids_cart().then(res => {

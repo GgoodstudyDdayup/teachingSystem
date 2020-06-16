@@ -496,3 +496,17 @@ export const Sget_xiaoguanjia_grade = (params) => {
 }
 
 
+
+
+//获取所有校管家信息
+export const get_all_zuoyeba = (params) => {
+    return instance.post('/api/wrong/get_all_zuoyeba', params)
+}
+//作业吧接口上传学生
+export const set_student_wrong_analysis = (params) => {
+    return instance.post('/api/wrong/set_student_wrong_analysis', params)
+}
+//作业吧编辑上传学生
+export const get_wrong_student_set = (params) => {
+    return instance.post('/api/wrong/get_wrong_student_set', params)
+}

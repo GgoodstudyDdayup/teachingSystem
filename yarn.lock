@@ -6687,6 +6687,14 @@ ignore@^4.0.6:
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
   integrity sha512-cyFDKrqc/YdcWFniJhzI42+AzS+gNwmUzOSFcRCQYwySuBBBy/KjuxWLZ/FHEH6Moq1NizMOBWyTcv8O4OZIMg==
 
+image-editor-little@^0.1.5-beta:
+  version "0.1.5-beta"
+  resolved "https://registry.yarnpkg.com/image-editor-little/-/image-editor-little-0.1.5-beta.tgz#13a86f40ece25b0cc8f5eb67052aee85ae7cb62d"
+  integrity sha512-AdbvgxTvbcXfrMi10RNCW5YervYpgbVYAFAho4SjYEdRKdi/yf6EcoHOtv4RxFxeDpwo/IQCrENSZCVvM1958w==
+  dependencies:
+    classnames "^2.2.6"
+    react-tiny-popover "^3.4.5"
+
 immediate@~3.0.5:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
@@ -11128,6 +11136,11 @@ react-slick@~0.25.2:
     json2mq "^0.2.0"
     lodash.debounce "^4.0.8"
     resize-observer-polyfill "^1.5.0"
+
+react-tiny-popover@^3.4.5:
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/react-tiny-popover/-/react-tiny-popover-3.4.5.tgz#66efb7951b98637d25deff156c9e870a3618a966"
+  integrity sha512-vZHIMCsphBwgUcz6wnwq+BZnukNzZhSXYTpe5qqTYGr+mTyVKN6q8NXsNkokh5QGnTzO3FpB3P33J64F1oiTqg==
 
 react-zmage@^0.8.5-beta.31:
   version "0.8.5-beta.31"

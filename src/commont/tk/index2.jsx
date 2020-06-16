@@ -447,7 +447,7 @@ class tikuguanli2 extends Component {
             return
         }
         const date = new Date()
-        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()}${date.getHours()}`
+        const ymdh = `${date.getFullYear()}${(date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1)}${date.getDate()<10?'0'+(date.getDate()):date.getDate()}${date.getHours()<10?'0'+(date.getHours()):date.getHours()}`
         localStorage.setItem('previewData', JSON.stringify(this.state.list))
         window.open(`http://devjiaoxueapi.yanuojiaoyu.com/api/download/show_paperinfo?paper_id=${this.state.paper_id}&token=${Md5(ymdh)}`)
     }
